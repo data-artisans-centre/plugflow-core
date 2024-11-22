@@ -3,6 +3,8 @@
 
 **PlugFlow** is a Python-based CLI framework designed to enable dynamic plugin execution. It allows developers to create modular, self-contained plugins with ease, ensuring scalability and extensibility for complex workflows.
 
+![Test Workflow Status](https://github.com/data-artisans-centre/plugflow-core/actions/workflows/test.yml/badge.svg)
+
 ---
 
 ## Features
