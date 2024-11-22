@@ -26,11 +26,10 @@ def test_execute_success(youtube_review_plugin):
     assert any(comment.get("author") == "TestUser" for comment in response)
 
 
-
 def test_execute_invalid_url(youtube_review_plugin):
     """Test execution with an invalid URL."""
     video_url = "https://www.youtube.com/watch?v=invalid123"
-    with pytest.raises(ValueError, match="Invalid URL"):
+    with pytest.raises(ValueError, match="Failed to fetch comments. Please check the video URL and try again."):
         youtube_review_plugin.execute(video_url, max_comments=1)
 
 def test_health_check_success(youtube_review_plugin):
