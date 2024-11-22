@@ -22,6 +22,6 @@ health:
 
 # Target to execute the youtube-review plugin
 .PHONY: extract-yt-review
-extract-yt-review:
+yt-review:
 	@python3.10 main.py execute $(PLUGIN) --params '{"video_url": "$(VIDEO_URL)", "max_comments": $(MAX_COMMENTS)}'
 

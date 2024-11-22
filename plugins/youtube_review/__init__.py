@@ -16,21 +16,38 @@ class Plugin(PluginBase):
 
         Returns:
             JSON: The comments data in JSON format.
+
+        Raises:
+            ValueError: If the URL is invalid or the comments cannot be fetched.
         """
         try:
             print(f"Fetching comments from video: {video_url}")
             downloader = YoutubeCommentDownloader()
-            comments = downloader.get_comments_from_url(video_url, sort_by=SORT_BY_POPULAR)
-
-            # Fetch and limit the number of comments
-            limited_comments = list(islice(comments, max_comments))
-
-            # Convert comments to JSON format
-            comments_json = json.dumps(limited_comments, indent=4)
-            print(f"Fetched {len(limited_comments)} comments.")
-            print(comments_json)
-            return comments_json
-        except Exception as e:
+            comments = downloader.get_comments_from_url(video_url)
+            print(json.dumps(list(comments), indent=4))
+            return [comment for _, comment in zip(range(max_comments), comments)]
+        except ValueError as e:
             print(f"An error occurred: {e}")
-            return json.dumps({"error": str(e)})
+            raise ValueError("Invalid URL") from e
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+            raise e
+    
+    def health_check(self):
+        """
+        Check if the YouTube comment downloader is functional.
+
+        Returns:
+            dict: Health status of the plugin.
+        """
+        try:
+            print("Performing health check...")
+            downloader = YoutubeCommentDownloader()
+            # Test with a known valid video ID
+            dummy_video_url = "https://www.youtube.com/watch?v=ScMzIvxBSi4"
+            comments = downloader.get_comments_from_url(dummy_video_url)
+            next(comments)  # Attempt to fetch the first comment
+            return {"status": "healthy", "message": "Service is available"}
+        except Exception as e:
+            return {"status": "unhealthy", "message": str(e)}
 
