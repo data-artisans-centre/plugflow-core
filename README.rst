@@ -3,7 +3,9 @@ PlugFlow: A Modular Plugin Framework
 
 **PlugFlow** is a lightweight and extensible Agentic SLM Python framework for creating and managing modular plugins. Designed for flexibility and scalability, PlugFlow enables seamless integration of plugins for various use cases.
 
-![Test Workflow Status](https://github.com/data-artisans-centre/plugflow-core/actions/workflows/run-tests.yml/badge.svg)
+.. image:: https://github.com/data-artisans-centre/plugflow-core/actions/workflows/run-tests.yml/badge.svg
+   :target: https://github.com/data-artisans-centre/plugflow-core/actions/workflows/run-tests.yml
+   :alt: Test Workflow Status
 
 
 Features
