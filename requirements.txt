@@ -1,0 +1,4 @@
+pytest
+youtube-comment-downloader
+click
+
