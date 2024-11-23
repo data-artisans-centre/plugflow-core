@@ -19,7 +19,9 @@ Features
 Quick Start
 -----------
 
-### Installation
+-------------------
+Installation
+-------------------
 
 Clone the repository and set up a virtual environment:
 
@@ -31,7 +33,9 @@ Clone the repository and set up a virtual environment:
     source env/bin/activate  # On Windows: env\Scripts\activate
     pip install -r requirements.txt
 
-### Basic Usage
+-------------------
+Basic Usage
+-------------------
 
 Run the framework with an available agent:
 
@@ -111,7 +115,9 @@ Example for `youtube-review` agent:
 Development
 -----------
 
-### Creating a New Agent
+-------------------------
+Creating a New Agent
+-------------------------
 
 1. Create a new folder under `agents/`.
 2. Add the required files: `__init__.py`, `manifest.json`, and `README.md`.
@@ -120,7 +126,9 @@ Development
 
 Refer to `docs/Creating_Agent.rst` for detailed instructions.
 
-### Running Tests
+-------------------
+Running Tests
+-------------------
 
 Run tests for all agents:
 
@@ -134,7 +142,9 @@ Run tests for a specific agent:
 
     pytest agents/<agent_name>/tests
 
-### Documentation
+-------------------
+Documentation
+-------------------
 
 Generate project documentation using Sphinx:
 
@@ -169,4 +179,5 @@ Support
 For issues or feature requests, please visit our GitHub repository:
 
 - GitHub: https://github.com/data-artisans-centre/plugflow-core
+
 
