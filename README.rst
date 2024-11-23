@@ -1,20 +1,20 @@
-PlugFlow: A Modular Plugin Framework
+PlugFlow: A Modular Agent Framework
 =====================================
 
-**PlugFlow** is a lightweight and extensible Agentic SLM Python framework for creating and managing modular plugins. Designed for flexibility and scalability, PlugFlow enables seamless integration of plugins for various use cases.
+**PlugFlow** is a lightweight and extensible Python framework designed for creating and managing modular agents. It enables seamless integration of agents for various use cases, with dynamic discovery, execution, and standardized interfaces.
 
 .. image:: https://github.com/data-artisans-centre/plugflow-core/actions/workflows/run-tests.yml/badge.svg
    :target: https://github.com/data-artisans-centre/plugflow-core/actions/workflows/run-tests.yml
    :alt: Test Workflow Status
 
-
 Features
 --------
 
-- **Modular Design**: Create self-contained plugins with ease.
-- **Dynamic Plugin Discovery**: Automatically detect and load plugins at runtime.
-- **Standardized Interface**: All plugins adhere to a consistent interface for execution and health monitoring.
-- **Extensible**: Build custom plugins for any domain.
+- **Modular Design**: Create self-contained agents with ease.
+- **Dynamic Agent Discovery**: Automatically detect and load agents at runtime.
+- **Standardized Interface**: All agents adhere to a consistent interface for execution and health monitoring.
+- **Extensible**: Build custom agents for any domain or workflow.
+- **Integrated Testing**: Include dedicated tests for every agent to ensure reliability.
 
 Quick Start
 -----------
@@ -26,49 +26,24 @@ Clone the repository and set up a virtual environment:
 .. code-block:: bash
 
     git clone https://github.com/data-artisans-centre/plugflow-core.git
-    cd plugflow
+    cd plugflow-core
     python -m venv env
     source env/bin/activate  # On Windows: env\Scripts\activate
     pip install -r requirements.txt
 
 ### Basic Usage
 
-Run the framework with an available plugin:
+Run the framework with an available agent:
 
 .. code-block:: bash
 
-    python main.py execute <plugin_name> --params '{"param1": "value1", "param2": "value2"}'
+    python main.py execute <agent_name> --params '{"param1": "value1", "param2": "value2"}'
 
 Example:
 
 .. code-block:: bash
 
     python main.py execute youtube-review --params '{"video_url": "https://www.youtube.com/watch?v=abc123", "max_comments": 10}'
-
-### Plugin Structure
-
-Each plugin follows a standardized structure:
-
-.. code-block:: text
-
-    plugins/
-    ├── <plugin_name>/
-    │   ├── __init__.py       # Main plugin logic
-    │   ├── manifest.json     # Plugin metadata
-    │   ├── README.md         # Plugin documentation
-    │   ├── tests/            # Plugin-specific tests
-    │       ├── __init__.py   # Test initialization
-    │       └── test_<plugin_name>.py  # Unit tests
-
-### Example Plugin: YouTube Review
-
-The **YouTube Review Plugin** fetches comments from a YouTube video.
-
-Usage:
-
-.. code-block:: bash
-
-    python main.py execute youtube-review --params '{"video_url": "https://youtu.be/abc123", "max_comments": 10}'
 
 Output:
 
@@ -77,50 +52,91 @@ Output:
     [
         {
             "author": "TestUser",
-            "comment": "This is a test comment",
-            "likes": 42,
-            "time": "2 days ago"
+            "comment": "This is a test comment"
         }
     ]
+
+Repository Structure
+--------------------
+
+The repository is organized as follows:
+
+.. code-block:: text
+
+    plugflow-core/
+    ├── agents/                # Agent-specific directories
+    │   ├── <agent_name>/      # Individual agent folder
+    │   │   ├── __init__.py    # Main agent logic
+    │   │   ├── manifest.json  # Metadata for the agent
+    │   │   ├── README.md      # Documentation for the agent
+    │   │   └── tests/         # Agent-specific tests
+    ├── core/                  # Core logic for PlugFlow
+    │   ├── base.py            # Base class for agents
+    │   ├── discovery.py       # Dynamic agent discovery
+    ├── docs/                  # Project documentation
+    ├── tests/                 # Global test cases
+    ├── requirements.txt       # Python dependencies
+    ├── setup.py               # Package setup file
+    ├── main.py                # Entry point for running the framework
+
+Agent Structure
+---------------
+
+Each agent must follow this structure:
+
+.. code-block:: text
+
+    agents/
+    ├── <agent_name>/
+    │   ├── __init__.py       # Main agent logic
+    │   ├── manifest.json     # Metadata for the agent
+    │   ├── README.md         # Documentation for the agent
+    │   ├── tests/            # Agent-specific tests
+    │       ├── __init__.py   # Test initialization
+    │       └── test_<agent_name>.py  # Unit tests for the agent
+
+Example for `youtube-review` agent:
+
+.. code-block:: text
+
+    agents/
+    ├── youtube_review/
+    │   ├── __init__.py
+    │   ├── manifest.json
+    │   ├── README.md
+    │   ├── tests/
+    │       ├── __init__.py
+    │       └── test_youtube_review.py
 
 Development
 -----------
 
-### Adding a New Plugin
+### Creating a New Agent
 
-1. Create a new folder under `plugins/`.
+1. Create a new folder under `agents/`.
 2. Add the required files: `__init__.py`, `manifest.json`, and `README.md`.
-3. Implement the plugin logic in `__init__.py`, adhering to the `PluginBase` interface.
+3. Implement the agent logic in `__init__.py`, adhering to the `AgentBase` interface.
+4. Add unit tests in the `tests/` directory.
+
+Refer to `docs/Creating_Agent.rst` for detailed instructions.
 
 ### Running Tests
 
-Each plugin must include unit tests in the `tests/` directory. Run tests for all plugins:
+Run tests for all agents:
 
 .. code-block:: bash
 
     pytest
 
-Run tests for a specific plugin:
+Run tests for a specific agent:
 
 .. code-block:: bash
 
-    pytest plugins/<plugin_name>/tests
+    pytest agents/<agent_name>/tests
 
-### Configuring Plugins
+### Documentation
 
-Add metadata for your plugin in `manifest.json`:
-
-.. code-block:: json
-
-    {
-        "name": "youtube-review",
-        "entry_point": "__init__"
-    }
-
-Documentation
--------------
-
-Generate project documentation using Sphinx and host it on Read the Docs.
+Generate project documentation using Sphinx:
 
 1. Install documentation dependencies:
 
@@ -140,7 +156,7 @@ Generate project documentation using Sphinx and host it on Read the Docs.
 Contributing
 ------------
 
-We welcome contributions! See the `CONTRIBUTOR.rst` file for detailed guidelines.
+We welcome contributions! Please refer to `CONTRIBUTING.rst` for guidelines.
 
 License
 -------

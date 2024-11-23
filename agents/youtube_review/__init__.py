@@ -1,15 +1,11 @@
-import logging
 import json
 from itertools import islice
-from core.base import PluginBase
+from core.base import AgentBase
+from log import logger
 from youtube_comment_downloader import YoutubeCommentDownloader
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-class Plugin(PluginBase):
-    """YouTube Review Plugin"""
+class YoutubeReviewAgent(AgentBase):
+    """Agent to fetch YouTube comments."""
 
     def execute(self, video_url, max_comments=10):
         """
@@ -58,4 +54,3 @@ class Plugin(PluginBase):
         except Exception as e:
             logger.error(f"Health check failed: {e}")
             return {"status": "unhealthy", "message": str(e)}
-
