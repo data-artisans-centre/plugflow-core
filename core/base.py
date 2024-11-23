@@ -1,13 +1,13 @@
-class PluginBase:
-    """Standard Plugin Interface"""
+class AgentBase:
+    """Standard Agent Interface"""
     def execute(self, **kwargs):
-        """Execute the plugin logic"""
-        raise NotImplementedError("Each plugin must implement the 'execute' method")
+        """Execute the agent logic"""
+        raise NotImplementedError("Each agent must implement the 'execute' method")
 
     
     def health_check(self):
         """
-        Check the health of the plugin.
+        Check the health of the agent.
         """
-        raise NotImplementedError("Each plugin must implement the 'health_check' method")
+        raise NotImplementedError("Each agent must implement the 'health_check' method")
 
