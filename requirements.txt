@@ -1,4 +1,6 @@
 pytest
 youtube-comment-downloader
 click
+textblob
+textstat
 
