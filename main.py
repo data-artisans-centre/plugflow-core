@@ -3,6 +3,7 @@ from core.discovery import discover_agents
 from core.executor import execute_agent_flow
 
 @click.group()
+
 def cli():
     """A CLI Tool with Agent Support"""
     pass
