@@ -1,169 +1,163 @@
 Contributing to PlugFlow
 ========================
 
-Thank you for your interest in contributing to **PlugFlow**! Contributions are what make this project an amazing tool for modular plugin-based development. Whether you are fixing bugs, proposing new features, or enhancing documentation, we welcome your input and effort.
-
-This document provides guidelines for contributing to the project, ensuring consistency and ease of collaboration.
-
-How Can You Contribute?
-------------------------
-
-1. **Reporting Bugs**: If you encounter any bugs, please file an issue with detailed reproduction steps.
-2. **Feature Requests**: Propose new features or enhancements by creating a feature request issue.
-3. **Improving Documentation**: Help us improve the project documentation.
-4. **Developing Plugins**: Create and contribute new plugins to extend PlugFlow's functionality.
-5. **Fixing Bugs**: Submit fixes for any open issues or bugs.
-6. **Writing Tests**: Add or improve test coverage for the project or specific plugins.
+Thank you for your interest in contributing to **PlugFlow**! We welcome contributions from the community to improve this modular agent framework. This guide outlines the process for contributing to the project.
 
 Getting Started
 ---------------
 
 ### 1. Fork the Repository
 
-Fork the repository to your own GitHub account:
+Fork the repository to your GitHub account:
 
 .. code-block:: bash
 
-    git clone https://github.com/<your-username>/PlugFlow.git
-    cd PlugFlow
+    git clone https://github.com/<your-username>/plugflow-core.git
+    cd plugflow-core
 
-### 2. Set Up Your Environment
+### 2. Set Up a Development Environment
 
-Create a virtual environment to work on the project:
+Create a virtual environment and install dependencies:
 
 .. code-block:: bash
 
     python -m venv env
     source env/bin/activate  # On Windows: env\Scripts\activate
-
-Install the required dependencies:
-
-.. code-block:: bash
-
     pip install -r requirements.txt
 
-### 3. Run Tests Locally
+### 3. Run the Tests
 
-Before making any changes, ensure all existing tests pass:
+Ensure that all tests pass before making changes:
 
 .. code-block:: bash
 
     pytest
 
-Contributing Workflow
-----------------------
+### 4. Set Up Pre-commit Hooks (Optional)
 
-1. **Create a Branch**: Create a branch for your changes:
+To ensure consistent code style, set up pre-commit hooks:
+
+.. code-block:: bash
+
+    pip install pre-commit
+    pre-commit install
+
+How to Contribute
+-----------------
+
+### Reporting Issues
+
+If you find a bug or have a feature request, open an issue on GitHub:
+
+- Provide a clear and concise description of the issue.
+- Include steps to reproduce the problem, if applicable.
+- Suggest potential solutions, if you have any.
+
+### Making Changes
+
+1. **Create a New Branch**:
+   Create a branch for your feature or bugfix:
 
    .. code-block:: bash
 
-       git checkout -b feature/my-feature
+       git checkout -b feature/<feature-name>
+       # or
+       git checkout -b bugfix/<bug-name>
 
-2. **Make Your Changes**: Edit the necessary files, write code, and add tests.
+2. **Write Clear and Modular Code**:
+   Follow the repository's coding conventions:
+   - Adhere to PEP 8 for Python code.
+   - Include docstrings for all classes and methods.
+   - Write clean and modular code.
 
-3. **Run Tests**: Verify that all tests pass and add tests for new functionality:
+3. **Write Tests**:
+   Add or update tests in the `tests/` directory for your changes. Ensure that all agents have dedicated tests under their `tests/` subdirectory.
+
+4. **Run Tests Locally**:
+   Verify that all tests pass:
 
    .. code-block:: bash
 
        pytest
 
-4. **Commit Changes**: Commit your changes with a descriptive commit message:
+5. **Document Your Changes**:
+   If your changes introduce a new feature or modify an existing one:
+   - Update the agent's `README.md` if applicable.
+   - Add or update documentation in the `docs/` directory.
+
+6. **Commit Your Changes**:
+   Write a clear and concise commit message:
 
    .. code-block:: bash
 
        git add .
-       git commit -m "Add feature: my-feature"
+       git commit -m "Add feature: <feature-name>"
 
-5. **Push Changes**: Push your branch to your forked repository:
+### Submitting Changes
+
+1. **Push Your Branch**:
+   Push your changes to your forked repository:
 
    .. code-block:: bash
 
-       git push origin feature/my-feature
+       git push origin feature/<feature-name>
 
-6. **Create a Pull Request**: Submit a pull request to the main repository and include:
-   - A description of your changes.
-   - The issue number (if applicable).
-   - Any necessary screenshots or references.
+2. **Open a Pull Request**:
+   - Go to the original repository on GitHub.
+   - Click on "New Pull Request."
+   - Provide a detailed description of the changes and link to any related issues.
 
-Code Style and Standards
-------------------------
+Review Process
+--------------
 
-Follow these guidelines to ensure consistency:
+Once you submit a pull request:
 
-1. **PEP 8 Compliance**: All Python code must comply with the PEP 8 style guide.
-2. **Type Annotations**: Use type hints in function definitions and method signatures.
-3. **Docstrings**: Write detailed docstrings for all classes and methods using Google or NumPy style.
-4. **Testing**: Ensure all features are covered by unit tests.
+1. **Automated Checks**:
+   - The CI pipeline will run tests and style checks on your branch.
+   - Ensure that all checks pass before requesting a review.
 
-To check code style, run:
+2. **Code Review**:
+   - A maintainer will review your changes and provide feedback.
+   - Address any requested changes promptly.
 
-.. code-block:: bash
+3. **Merge**:
+   - Once approved, your changes will be merged into the `main` branch.
 
-    pip install flake8
-    flake8
-
-Branch Naming Convention
-------------------------
-
-Use the following naming conventions for branches:
-
-- **Feature**: `feature/<feature-name>`
-- **Bug Fix**: `fix/<bug-name>`
-- **Documentation**: `docs/<documentation-name>`
-
-Testing Guidelines
-------------------
-
-Write unit tests for all new features or bug fixes. Place tests in the appropriate `tests/` directory.
-
-Run tests locally before submitting a pull request:
-
-.. code-block:: bash
-
-    pytest
-
-Writing Plugin Tests
---------------------
-
-Each plugin must include a `tests` directory with unit tests. The tests should validate:
-
-1. **Execute Logic**: Ensure the `execute` method behaves as expected.
-2. **Health Check**: Test the `health_check` method for operational status.
-3. **Error Handling**: Validate that the plugin handles invalid inputs gracefully.
-
-Example Test:
-
-.. code-block:: python
-
-    def test_execute_success(plugin_instance):
-        video_url = "https://www.youtube.com/watch?v=valid123"
-        response = plugin_instance.execute(video_url, max_comments=1)
-        assert any(comment["author"] == "TestUser" for comment in response)
-
-Community Guidelines
---------------------
-
-- Be respectful and inclusive to all contributors.
-- Ensure discussions remain constructive and professional.
-- Provide meaningful feedback when reviewing pull requests.
-
-Issues and Bug Reports
+Contribution Guidelines
 -----------------------
 
-When submitting an issue or bug report, include:
+- **Code Style**: Follow PEP 8 for Python code.
+- **Modularity**: Ensure your code is modular and reusable.
+- **Testing**: Add tests for all new features and bugfixes.
+- **Documentation**: Update relevant documentation for your changes.
 
-1. A clear and descriptive title.
-2. Detailed steps to reproduce the issue.
-3. The expected behavior and observed behavior.
-4. Any relevant logs or screenshots.
+Adding a New Agent
+------------------
 
-License
+To add a new agent, follow these steps:
+
+1. Create a folder for the agent under `agents/`.
+2. Add the required files: `__init__.py`, `manifest.json`, and `README.md`.
+3. Implement the agent logic in `__init__.py`, adhering to the `AgentBase` interface.
+4. Write tests for the agent in a `tests/` subdirectory.
+5. Add the agent to the repository using the discovery process.
+
+Refer to `docs/Creating_Agent.rst` for detailed instructions.
+
+Community Standards
+-------------------
+
+- Be respectful and inclusive.
+- Provide constructive feedback.
+- Collaborate to build a better framework for everyone.
+
+Contact
 -------
 
-By contributing to PlugFlow, you agree that your contributions will be licensed under the project's **MIT License**.
+For questions or discussions about contributing, open an issue on GitHub or join the discussion forum:
 
-Thank You
----------
+- GitHub Issues: https://github.com/data-artisans-centre/plugflow-core/issues
+- GitHub Discussions: https://github.com/data-artisans-centre/plugflow-core/discussions
 
-We appreciate your contributions to PlugFlow. Together, we can make this project even better!
+Thank you for your contributions! 🚀
 
