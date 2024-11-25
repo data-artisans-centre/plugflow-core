@@ -1,0 +1,5 @@
+{
+    "name": "sherlock",
+    "entry_point": "__init__",
+    "class_name": "SherlockAgent"
+}

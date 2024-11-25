@@ -1,0 +1,5 @@
+{
+    "name": "review-sentiment",
+    "entry_point": "__init__",
+    "class_name": "YouTubeReviewAnalyzer"
+}
