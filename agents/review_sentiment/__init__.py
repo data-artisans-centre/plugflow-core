@@ -1,7 +1,6 @@
 import json
 from typing import Dict, List
 from textblob import TextBlob
-import textstat
 from pydantic import BaseModel, Field, ValidationError
 from core.base import AgentBase
 from log import logger
@@ -12,8 +11,58 @@ class CommentAnalysis(BaseModel):
     comment: str = Field(..., description="The text of the comment.")
     sentiment_polarity: float = Field(..., description="Sentiment polarity of the comment (-1 to 1).")
     sentiment_subjectivity: float = Field(..., description="Subjectivity of the comment (0 to 1).")
-    readability_score: float = Field(..., description="Flesch Reading Ease score.")
+    readability_score: float = Field(..., description="Custom Reading Ease score.")
     review_length: int = Field(..., description="Length of the comment in words.")
+
+
+class ReadabilityScorer:
+    """Custom readability scoring implementation."""
+    @staticmethod
+    def calculate_flesch_reading_ease(text: str) -> float:
+        """
+        Calculate a custom Flesch Reading Ease equivalent score.
+        
+        Args:
+            text (str): The text to analyze.
+        
+        Returns:
+            float: A readability score similar to Flesch Reading Ease.
+        """
+        # Count sentences (minimum 1 to avoid division by zero)
+        sentences = max(1, len([s for s in text.split('.') if s.strip()]))
+        
+        # Count words
+        words = text.split()
+        word_count = len(words)
+        
+        # Count syllables (simplified estimation)
+        def count_syllables(word: str) -> int:
+            vowels = 'aeiouy'
+            word = word.lower()
+            count = 0
+            if len(word) > 3:
+                if word.endswith('e'):
+                    word = word[:-1]
+            
+            # Count vowel groups
+            for index in range(len(word)):
+                if (word[index] in vowels and 
+                    (index == 0 or word[index-1] not in vowels)):
+                    count += 1
+            
+            return max(1, count)
+        
+        syllable_count = sum(count_syllables(word) for word in words)
+        
+        # Custom Flesch-like readability calculation
+        try:
+            score = 206.835 - (
+                1.015 * (word_count / sentences) - 
+                84.6 * (syllable_count / word_count)
+            )
+            return max(0, min(100, score))  # Bound between 0-100
+        except ZeroDivisionError:
+            return 50.0  # Default score if calculation fails
 
 
 class YouTubeReviewAnalyzer(AgentBase):
@@ -22,6 +71,7 @@ class YouTubeReviewAnalyzer(AgentBase):
     def __init__(self):
         super().__init__()
         self.name = "youtube-review-analyzer"
+        self.readability_scorer = ReadabilityScorer()
 
     def analyze_comment(self, comment_text: str) -> CommentAnalysis:
         """
@@ -38,7 +88,7 @@ class YouTubeReviewAnalyzer(AgentBase):
             "comment": comment_text,
             "sentiment_polarity": blob.sentiment.polarity,
             "sentiment_subjectivity": blob.sentiment.subjectivity,
-            "readability_score": textstat.flesch_reading_ease(comment_text),
+            "readability_score": self.readability_scorer.calculate_flesch_reading_ease(comment_text),
             "review_length": len(comment_text.split())
         }
         try:
@@ -62,17 +112,16 @@ class YouTubeReviewAnalyzer(AgentBase):
             try:
                 analysis = self.analyze_comment(comment["comment"])
                 result = {
-                    "author": comment["author"],
+                    "author": comment.get("author", "Unknown"),
                     "original_comment": comment["comment"],
-                    "likes": comment["likes"],
-                    "time": comment["time"],
-                    "analysis": analysis.dict()  # Converts Pydantic model to dictionary
+                    "likes": comment.get("likes", 0),
+                    "time": comment.get("time", "Unknown"),
+                    "analysis": analysis.model_dump()
                 }
                 results.append(result)
             except Exception as e:
                 logger.error(f"Error processing comment: {e}")
         return results
-
 
     def execute(self, video_url: str, max_comments: int = 10):
         """
