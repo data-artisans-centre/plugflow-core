@@ -1,0 +1,5 @@
+{
+    "name": "historical-event-scraper",
+    "entry_point": "__init__",
+    "class_name": "HistoricalEventsAgent"
+}
