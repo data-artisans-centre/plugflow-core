@@ -2,24 +2,23 @@ import json
 from typing import Dict, List
 from textblob import TextBlob
 import textstat
-from dataclasses import dataclass
+from pydantic import BaseModel, Field, ValidationError
 from core.base import AgentBase
 from log import logger
 
 
-@dataclass
-class CommentAnalysis:
-    """Data structure to hold analysis results for a single comment."""
-    comment: str
-    sentiment_polarity: float
-    sentiment_subjectivity: float
-    readability_score: float
-    review_length: int
+class CommentAnalysis(BaseModel):
+    """Pydantic model to hold analysis results for a single comment."""
+    comment: str = Field(..., description="The text of the comment.")
+    sentiment_polarity: float = Field(..., description="Sentiment polarity of the comment (-1 to 1).")
+    sentiment_subjectivity: float = Field(..., description="Subjectivity of the comment (0 to 1).")
+    readability_score: float = Field(..., description="Flesch Reading Ease score.")
+    review_length: int = Field(..., description="Length of the comment in words.")
 
 
 class YouTubeReviewAnalyzer(AgentBase):
     """Agent to analyze YouTube comments."""
-    
+
     def __init__(self):
         super().__init__()
         self.name = "youtube-review-analyzer"
@@ -32,16 +31,21 @@ class YouTubeReviewAnalyzer(AgentBase):
             comment_text (str): The comment text to analyze.
 
         Returns:
-            CommentAnalysis: An object containing analysis results.
+            CommentAnalysis: A validated Pydantic model containing analysis results.
         """
         blob = TextBlob(comment_text)
-        return CommentAnalysis(
-            comment=comment_text,
-            sentiment_polarity=blob.sentiment.polarity,
-            sentiment_subjectivity=blob.sentiment.subjectivity,
-            readability_score=textstat.flesch_reading_ease(comment_text),
-            review_length=len(comment_text.split())
-        )
+        analysis_data = {
+            "comment": comment_text,
+            "sentiment_polarity": blob.sentiment.polarity,
+            "sentiment_subjectivity": blob.sentiment.subjectivity,
+            "readability_score": textstat.flesch_reading_ease(comment_text),
+            "review_length": len(comment_text.split())
+        }
+        try:
+            return CommentAnalysis(**analysis_data)
+        except ValidationError as e:
+            logger.error(f"Validation error for comment analysis: {e}")
+            raise ValueError("Invalid analysis data.") from e
 
     def process_comments(self, comments_data: List[Dict]) -> List[Dict]:
         """
@@ -55,23 +59,20 @@ class YouTubeReviewAnalyzer(AgentBase):
         """
         results = []
         for comment in comments_data:
-            analysis = self.analyze_comment(comment["comment"])
-            result = {
-                "author": comment["author"],
-                "original_comment": comment["comment"],
-                "likes": comment["likes"],
-                "time": comment["time"],
-                "analysis": {
-                    "sentiment": {
-                        "polarity": analysis.sentiment_polarity,
-                        "subjectivity": analysis.sentiment_subjectivity
-                    },
-                    "readability": analysis.readability_score,
-                    "review_length": analysis.review_length
+            try:
+                analysis = self.analyze_comment(comment["comment"])
+                result = {
+                    "author": comment["author"],
+                    "original_comment": comment["comment"],
+                    "likes": comment["likes"],
+                    "time": comment["time"],
+                    "analysis": analysis.dict()  # Converts Pydantic model to dictionary
                 }
-            }
-            results.append(result)
+                results.append(result)
+            except Exception as e:
+                logger.error(f"Error processing comment: {e}")
         return results
+
 
     def execute(self, video_url: str, max_comments: int = 10):
         """
