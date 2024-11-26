@@ -1,0 +1,7 @@
+{
+    "name": "website-metadata-extractor",
+    "description": "An agent to extract metadata from a website.",
+    "class_name": "WebsiteMetadataAgent",
+    "authors": ["Arisha gupta"],
+    "entry_point": "__init__"
+}
