@@ -1,0 +1,2 @@
+[console_scripts]
+youtube-comment-downloader = youtube_comment_downloader:main

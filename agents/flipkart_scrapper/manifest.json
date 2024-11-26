@@ -1,0 +1,5 @@
+{
+    "name": "flipkart_scrapper",
+    "entry_point": "__init__",
+    "class_name": "FlipkartScrapperAgent"
+}
