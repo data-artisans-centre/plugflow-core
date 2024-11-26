@@ -3,4 +3,6 @@ youtube-comment-downloader
 click
 textblob
 textstat
+pydantic 
+
 
