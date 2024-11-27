@@ -1,5 +1,7 @@
 pytest
 youtube-comment-downloader
 click
+textblob
+pydantic
 requests
 beautifulsoup4
