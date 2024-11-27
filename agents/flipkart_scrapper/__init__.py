@@ -10,14 +10,14 @@ from log import logger
 
 class Product(BaseModel):
     """Pydantic model for a Flipkart product."""
-    product_name: str = Field(...,description="Name of the Product")
-    category: str = Field(...,description='Category of the Product')
-    sub_category: str = Field(...,'Sub-Category of the Product')
-    price: str = Field(...,description='Price of the Product')
-    offers: str = Field(...,description='Offers given for this Product')
-    delivery_charge: str = Field(...,description='Delivery charges on this Product')
-    rating: Optional[str] = Field(...,description='Overall Rating for this Product')
-    customers_bought: str = Field(...,description='No. of people bought this Product')
+    product_name: str
+    category: str = "N/A"
+    sub_category: str = "N/A"
+    price: str
+    offers: str = "No offers"
+    delivery_charge: str = "Free delivery"
+    rating: Optional[str] = "No rating"
+    customers_bought: str = "N/A"
 
 
 class FlipkartScrapperAgent(AgentBase):
