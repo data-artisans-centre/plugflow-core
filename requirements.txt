@@ -3,4 +3,3 @@ youtube-comment-downloader
 click
 requests
 beautifulsoup4
-pydantic
