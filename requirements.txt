@@ -1,7 +1,17 @@
+
+#testing
 pytest
+pytest-mock
+
+
+
 youtube-comment-downloader
 click
 textblob
 pydantic 
+
+
+#finwiz
+yfinance
 
 
