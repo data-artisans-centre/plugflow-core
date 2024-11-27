@@ -26,6 +26,7 @@ Install the dependencies using pip:
 .. code-block:: bash
 
     pip install requests beautifulsoup4
+    pip install pydantic
 
 Parameters
 ----------

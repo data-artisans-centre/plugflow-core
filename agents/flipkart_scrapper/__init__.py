@@ -1,17 +1,30 @@
+import json
 import requests
 from bs4 import BeautifulSoup
-import json
+from pydantic import BaseModel, HttpUrl, ValidationError,Field
+from typing import List, Optional
 from itertools import islice
 from core.base import AgentBase
 from log import logger
 
 
+class Product(BaseModel):
+    """Pydantic model for a Flipkart product."""
+    product_name: str = Field(...,description="Name of the Product")
+    category: str = Field(...,description='Category of the Product')
+    sub_category: str = Field(...,'Sub-Category of the Product')
+    price: str = Field(...,description='Price of the Product')
+    offers: str = Field(...,description='Offers given for this Product')
+    delivery_charge: str = Field(...,description='Delivery charges on this Product')
+    rating: Optional[str] = Field(...,description='Overall Rating for this Product')
+    customers_bought: str = Field(...,description='No. of people bought this Product')
+
+
 class FlipkartScrapperAgent(AgentBase):
     """Agent to fetch product details from Flipkart."""
+    BASE_URL: HttpUrl = "https://www.flipkart.com/search?q="
 
-    BASE_URL = "https://www.flipkart.com/search?q="
-
-    def execute(self, item_name, max_products=10):
+    def execute(self, item_name: str, max_products: int = 10) -> str:
         """
         Fetch product details from Flipkart based on a search term.
 
@@ -20,83 +33,57 @@ class FlipkartScrapperAgent(AgentBase):
             max_products (int): Maximum number of products to fetch.
 
         Returns:
-            list: A list of dictionaries containing product details.
+            str: JSON string containing product details.
 
         Raises:
             ValueError: If the request fails or no product details are found.
         """
+        search_url = f"{self.BASE_URL}{item_name.replace(' ', '+')}"
+        logger.debug(f"Constructed Search URL: {search_url}")
+
         try:
-            # Construct search URL
-            search_url = f"{self.BASE_URL}{item_name.replace(' ', '+')}"
-            logger.debug(f"Constructed Search URL: {search_url}")
-            logger.info(f"Fetching product details for: {item_name}")
-            logger.debug(f"Search URL: {search_url}")
-
-            # Make the request
             response = requests.get(search_url, headers={'User-Agent': 'Mozilla/5.0'})
-            if response.status_code != 200:
-                error_message = "Failed to fetch product details. Please check the inputs and try again."
-                logger.error(error_message)
-                raise ValueError(error_message)
+            response.raise_for_status()
+        except requests.RequestException as e:
+            logger.error("Failed to fetch product details. Please check the URL or network.")
+            raise ValueError("Failed to fetch product details. Please check the URL or network.") from e
 
-            soup = BeautifulSoup(response.text, 'html.parser')
-            product_cards = soup.find_all('div', {'class': '_1AtVbE'})  # Update if necessary
-            logger.info(f"Found {len(product_cards)} product cards.")
+        soup = BeautifulSoup(response.text, 'html.parser')
+        product_cards = soup.find_all('div', {'class': '_1AtVbE'})
 
-            products = []
-            for card in islice(product_cards, max_products):
-                # Extract product details
-                product_name = card.find('div', {'class': '_4rR01T'}) or card.find('a', {'class': 'IRpwTa'})
-                price = card.find('div', {'class': '_30jeq3'})
-                rating = card.find('div', {'class': '_3LWZlK'})
-                offers = card.find('div', {'class': '_3Ay6Sb'})
-                delivery = card.find('div', {'class': '_3XINqE'})
+        products = []
+        for card in islice(product_cards, max_products):
+            try:
+                product = Product(
+                    product_name=(card.find('div', {'class': '_4rR01T'}) or 
+                                  card.find('a', {'class': 'IRpwTa'})).text.strip(),
+                    price=card.find('div', {'class': '_30jeq3'}).text.strip(),
+                    offers=card.find('div', {'class': '_3Ay6Sb'}).text.strip() if card.find('div', {'class': '_3Ay6Sb'}) else "No offers",
+                    delivery_charge=card.find('div', {'class': '_3XINqE'}).text.strip() if card.find('div', {'class': '_3XINqE'}) else "Free delivery",
+                    rating=card.find('div', {'class': '_3LWZlK'}).text.strip() if card.find('div', {'class': '_3LWZlK'}) else None
+                )
+                products.append(product.model_dump())
+            except AttributeError:
+                continue  # Skip cards with missing essential data
 
-                # Skip if essential data is missing
-                if not product_name or not price:
-                    continue
+        if not products:
+            logger.error("No products found for the given search query.")
+            raise ValueError("No products found for the given search query.")
 
-                product_details = {
-                    "product_name": product_name.text.strip(),
-                    "category": "N/A",  # Flipkart does not directly show category in search results
-                    "sub_category": "N/A",  # Can add subcategory parsing if needed
-                    "price": price.text.strip(),
-                    "offers": offers.text.strip() if offers else "No offers",
-                    "delivery_charge": delivery.text.strip() if delivery else "Free delivery",
-                    "rating": rating.text.strip() if rating else "No rating",
-                    "customers_bought": "N/A",  # Flipkart does not provide this directly in search results
-                }
-                products.append(product_details)
+        logger.info(f"Successfully fetched {len(products)} products.")
+        return json.dumps(products, indent=4)
 
-            if not products:
-                error_message = "No products found for the given search query."
-                logger.error(error_message)
-                raise ValueError(error_message)
-
-            # Return as JSON
-            logger.info(f"Successfully fetched {len(products)} products.")
-            return json.dumps(products, indent=4)
-
-        except Exception as e:
-            logger.error(f"An error occurred: {e}")
-            raise e
-
-    def health_check(self):
+    def health_check(self) -> dict:
         """
         Check if the Flipkart scraper is functional.
 
         Returns:
             dict: Health status of the scraper.
         """
+        logger.info("Performing health check...")
         try:
-            logger.info("Performing health check...")
-            test_search = "iphone"
-            result = self.execute(test_search, max_products=1)
-            if result:
-                logger.info("Health check passed.")
-                return {"status": "healthy", "message": "Scraper is functional"}
-            else:
-                raise Exception("Health check failed: No results.")
+            test_result = self.execute("iphone", max_products=1)
+            return {"status": "healthy", "message": "Scraper is functional"}
         except Exception as e:
             logger.error(f"Health check failed: {e}")
             return {"status": "unhealthy", "message": str(e)}

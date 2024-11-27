@@ -1,6 +1,8 @@
 import pytest # type: ignore
 import json
 from agents.flipkart_scrapper import FlipkartScrapperAgent
+from unittest.mock import Mock
+import requests
 
 
 class MockResponse:
@@ -8,17 +10,23 @@ class MockResponse:
     def __init__(self, text, status_code=200):
         self.text = text
         self.status_code = status_code
+    
+    def raise_for_status(self):
+        if self.status_code != 200:
+            raise requests.exceptions.RequestException(f"HTTP {self.status_code}")
 
 
 class MockRequests:
     """Mock class to simulate requests.get."""
+    RequestException = requests.exceptions.RequestException  # Link to real RequestException
+
     def __init__(self, mock_data):
         self.mock_data = mock_data
 
     def get(self, url, headers=None):
         if "iphone" in url:
             return MockResponse(self.mock_data["valid"])
-        if "empty" in url:
+        elif "empty" in url:
             return MockResponse("", 200)
         return MockResponse("Error", 404)
 
@@ -77,8 +85,7 @@ def test_execute_success(flipkart_scrapper_agent):
 def test_execute_empty_response(flipkart_scrapper_agent, monkeypatch):
     """Test execution with a search query that yields no results."""
     def mock_get_empty(*args, **kwargs):
-       
-        return MockResponse("", 200)  # Simulate an empty HTML response
+       return MockResponse("", 200)  # Simulate an empty HTML response
 
     monkeypatch.setattr("agents.flipkart_scrapper.requests.get", mock_get_empty)
 
@@ -87,7 +94,6 @@ def test_execute_empty_response(flipkart_scrapper_agent, monkeypatch):
 
     with pytest.raises(ValueError, match="No products found for the given search query."):
         flipkart_scrapper_agent.execute(item_name=item_name, max_products=max_products)
-
 
 
 def test_execute_invalid_url(flipkart_scrapper_agent, monkeypatch):
@@ -101,12 +107,10 @@ def test_execute_invalid_url(flipkart_scrapper_agent, monkeypatch):
     item_name = "invalid_item"
     max_products = 1
 
-    try:
-        with pytest.raises(ValueError, match=r"Failed to fetch product details\. Please check the (inputs|URL) and try again\."):
-            flipkart_scrapper_agent.execute(item_name=item_name, max_products=max_products)
-    except AssertionError as e:
-        print(f"Actual error message: {e}")
-        raise
+    # Used pytest.raises to validate exception and message
+    with pytest.raises(ValueError, match=r"Failed to fetch product details\. Please check the URL or network\."):
+        flipkart_scrapper_agent.execute(item_name=item_name, max_products=max_products)
+ 
 
 def test_health_check_success(flipkart_scrapper_agent):
     """Test health check success."""

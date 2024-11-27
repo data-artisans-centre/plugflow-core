@@ -3,5 +3,4 @@ youtube-comment-downloader
 click
 requests
 beautifulsoup4
-pandas
-lxml
+pydantic
