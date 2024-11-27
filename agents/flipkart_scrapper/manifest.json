@@ -1,5 +1,9 @@
 {
     "name": "flipkart_scrapper",
     "entry_point": "__init__",
+    "description":"This Python module scrapes the Flipkart website and fetches the product details.",
+    "category":"Data Scrapping",
+    "tags":"",
+    "authors":["Nilanjana Dey <nilanjanadey276@gmail.com>"],
     "class_name": "FlipkartScrapperAgent"
 }
