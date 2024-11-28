@@ -1,0 +1,5 @@
+{
+  "name": "chatgpt-agent",
+  "class_name": "ChatGPT",
+  "entry_point": "__init__"
+}
