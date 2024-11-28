@@ -1,5 +1,5 @@
 {
-    "name": "historical-event-scraper",
+    "name": "historical_event_scraper",
     "entry_point": "__init__",
     "authors":"Suparna B",
     "class_name": "HistoricalEventsAgent"

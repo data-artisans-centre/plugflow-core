@@ -7,7 +7,7 @@ import requests
 class HistoricalEventsAgent(AgentBase):
     """Agent to fetch historical events for the current date."""
 
-    def execute(self):
+    def execute(self, month, day):
         """
         Fetch historical events for today's date from the API and return as a list of dictionaries.
 
@@ -20,8 +20,8 @@ class HistoricalEventsAgent(AgentBase):
         try:
             # Get the current date
             today = datetime.now()
-            month = today.month
-            day = today.day
+            # month = today.month
+            # day = today.day
 
             # Construct the API URL
             url = f"https://byabbe.se/on-this-day/{month}/{day}/events.json"

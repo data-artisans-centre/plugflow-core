@@ -14,7 +14,7 @@ class MockRequests:
                 "events": [{"year": "2000", "description": "Test Event"}]
             })
         elif "/11/26/events.json" in url:
-            # Simulate valid data for today's date
+            # Simulate valid data for a specific date with exactly 2 events
             return MockResponse({
                 "events": [
                     {"year": "1922", "description": "Tutankhamun's tomb opened."},
@@ -52,7 +52,7 @@ def historical_event_scraper(monkeypatch):
 
 def test_execute_success(historical_event_scraper):
     """Test successful execution of the HistoricalEventsAgent."""
-    response = historical_event_scraper.execute()
+    response = historical_event_scraper.execute(11, 26)
     assert len(response) == 2, "Expected 2 events in the response."
     assert response[0]["year"] == "1922", "Expected the first event year to be 1922."
     assert "Tutankhamun" in response[0]["description"], "Expected Tutankhamun in the first event description."
@@ -64,7 +64,7 @@ def test_execute_no_events(historical_event_scraper, monkeypatch):
         return MockResponse({"events": []})
 
     monkeypatch.setattr("agents.historical_event_scraper.requests.get", mock_no_events)
-    response = historical_event_scraper.execute()
+    response = historical_event_scraper.execute(11, 26)
     assert response == [], "Expected an empty list when no events are available."
 
 
@@ -75,7 +75,7 @@ def test_execute_invalid_url(historical_event_scraper, monkeypatch):
 
     monkeypatch.setattr("agents.historical_event_scraper.requests.get", mock_invalid_url)
     with pytest.raises(ValueError, match="Failed to fetch historical events. Please check the API or your connection."):
-        historical_event_scraper.execute()
+        historical_event_scraper.execute(11, 26)
 
 
 def test_health_check_success(historical_event_scraper):
