@@ -1,6 +1,6 @@
 pytest~=7.4.0
 youtube-comment-downloader
-click~=8.0.4
-
-
+click
+textblob
+pydantic
 requests~=2.31.0
