@@ -1,4 +1,6 @@
-pytest
+pytest~=7.4.0
 youtube-comment-downloader
-click
+click~=8.0.4
 
+
+requests~=2.31.0
