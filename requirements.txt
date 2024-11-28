@@ -8,8 +8,7 @@ textblob
 pydantic 
 
 
-<<<<<<< Updated upstream
-=======
+
 #ticker
 yfinance
 
@@ -20,4 +19,3 @@ feedparser
 
 
 
->>>>>>> Stashed changes
