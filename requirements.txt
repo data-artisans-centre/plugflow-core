@@ -2,5 +2,7 @@ pytest
 youtube-comment-downloader
 click
 googletrans
+textblob
+pydantic 
 
 
