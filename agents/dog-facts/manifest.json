@@ -1,0 +1,9 @@
+{
+  "name": "dog-facts",
+  "description": "Dogs and Breeds related information",
+  "authors": ["Shibin Joseph <shibin.joseph@mba.christuniversity.in>"],
+  "category": "Facts",
+  "tags": ["breeds"],
+  "entry_point": "__init__",
+  "class_name": "DogFactsAgent"
+}

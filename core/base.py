@@ -1,4 +1,9 @@
+import requests
+
 class AgentBase:
+    def __init__(self):
+        self.http = requests
+
     """Standard Agent Interface"""
     def execute(self, **kwargs):
         """Execute the agent logic"""

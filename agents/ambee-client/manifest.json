@@ -1,0 +1,9 @@
+{
+    "name": "ambee-client",
+    "description": "Ambee's APIs deliver hyperlocal and highly accurate climate data directly to your applications. Organized around REST, these APIs return HTTP response codes, with responses encoded in JSON.",
+    "category": "Environment",
+    "tags": ["weather", "pollen", "wildfire"],
+    "authors": ["Bastin Robins .J <bastinrobins@gmail.com>"],
+    "entry_point": "__init__",
+    "class_name": "AmbeeClient"
+}

@@ -1,4 +1,5 @@
 import json
+from core.log import logger
 
 def execute_agent_flow(flow, agents, params):
     """
@@ -13,14 +14,14 @@ def execute_agent_flow(flow, agents, params):
     for agent_name in flow:
         agent_class = agents.get(agent_name)
         if not agent_class:
-            print(f"Agent {agent_name} not found.")
+            logger.info(f"Agent {agent_name} not found.")
             continue
 
         # Instantiate and execute the agent
         try:
             agent_instance = agent_class()
-            print(f"Executing {agent_name}...")
+            logger.info(f"Executing {agent_name}...")
             result = agent_instance.execute(**param_dict)
-            print(f"Result from {agent_name}: {result}")
+            logger.info(f"Result from {agent_name}: {result}")
         except Exception as e:
-            print(f"Error executing {agent_name}: {e}")
+            logger.warn(f"Error executing {agent_name}: {e}")

@@ -1,7 +1,7 @@
 import json
 from itertools import islice
 from core.base import AgentBase
-from log import logger
+from core.log import logger
 from youtube_comment_downloader import YoutubeCommentDownloader
 
 class YoutubeReviewAgent(AgentBase):

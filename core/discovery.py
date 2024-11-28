@@ -1,12 +1,8 @@
 import os
 import json
 import importlib
-import logging
+from core.log import logger
 from core.base import AgentBase
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 AGENTS_DIR = "agents"
 
