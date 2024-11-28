@@ -43,7 +43,7 @@ Execute the agent directly from the terminal using the following command:
 
 .. code-block:: bash
 
-    >python main.py execute google_news --params "{\"apikey\":\"hidden\",\"category\":\"technology\",\"country\":\"in\",\"max_articles\":5}"
+    python main.py execute google_news --params "{\"apikey\":\"hidden\",\"category\":\"technology\",\"country\":\"in\",\"max_articles\":5}"
 
 **Note**: When running this command on Windows CMD, ensure to escape the double quotes in the JSON parameter properly as shown.
 
