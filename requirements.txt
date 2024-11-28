@@ -1,4 +1,7 @@
 pytest
 youtube-comment-downloader
 click
+textblob
+pydantic 
+
 
