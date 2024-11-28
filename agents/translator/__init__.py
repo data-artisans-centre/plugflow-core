@@ -10,7 +10,6 @@ class TranslatorAgent(AgentBase):
         """
         Initialize the TranslatorAgent.
         """
-        super().__init__()
         self.translator = Translator()
 
     def execute(self, **kwargs):
@@ -27,18 +26,14 @@ class TranslatorAgent(AgentBase):
             ValueError: If translation fails or invalid input is provided.
         """
         try:
-            # Extract parameters
             text = kwargs.get('text', '')
             target_language = kwargs.get('target_language', 'en')
 
-            # Validate input
             if not text:
                 raise ValueError("Text cannot be empty.")
 
-            # Perform translation
             translation = self.translator.translate(text, dest=target_language)
 
-            # Prepare translation result
             translation_result = {
                 'original_text': text,
                 'translated_text': translation.text,
@@ -46,16 +41,15 @@ class TranslatorAgent(AgentBase):
                 'target_language': translation.dest
             }
 
-            # Convert to JSON for logging/display
             translation_json = json.dumps(translation_result)
             print(translation_json)
 
             return translation_result
 
         except Exception as e:
-            # Log and raise error
             print(f"Translation error: {e}")
             raise ValueError(f"Failed to translate text. {str(e)}") from e
+        
 
     def health_check(self) -> Dict[str, str]:
         """
@@ -67,7 +61,6 @@ class TranslatorAgent(AgentBase):
         try:
             logger.info("Performing translator health check...")
             
-            # Test translation with a simple string
             test_translation = self.translator.translate("hello", dest='es')
             
             if test_translation and test_translation.text:
