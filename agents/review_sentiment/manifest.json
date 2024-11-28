@@ -1,0 +1,9 @@
+{
+    "name": "review-sentiment",
+    "entry_point": "__init__",
+    "description":"This Python module analyzes YouTube comments for sentiment, readability, and other metrics using TextBlob, a custom readability scorer, and Pydantic for data validation",
+    "category":"LangProcessing",
+    "tags":"",
+    "authors":["Ujan Galui <ujan.g570@gmail.com>"],
+    "class_name": "YouTubeReviewAnalyzer"
+}
