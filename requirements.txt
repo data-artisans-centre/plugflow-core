@@ -1,7 +1,23 @@
 pytest
 youtube-comment-downloader
 click
+
+#sentiment analysis
 textblob
+
 pydantic 
 
 
+<<<<<<< Updated upstream
+=======
+#ticker
+yfinance
+
+
+#news_agent
+feedparser
+
+
+
+
+>>>>>>> Stashed changes
