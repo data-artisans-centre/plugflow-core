@@ -5,17 +5,14 @@ click
 #sentiment analysis
 textblob
 
-pydantic 
-
-
 
 #ticker
 yfinance
 
 
-#news_agent
-feedparser
 
 
 
 
+pydantic
+requests
