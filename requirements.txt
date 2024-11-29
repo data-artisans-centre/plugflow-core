@@ -1,7 +1,12 @@
-pytest
+pytest~=7.4.0
 youtube-comment-downloader
 click
 textblob
+<<<<<<< HEAD
 pydantic 
 beautifulsoup4
 
+=======
+pydantic
+requests~=2.31.0
+>>>>>>> d84a6db511ef6c7f8906c73f32546a0257322769
