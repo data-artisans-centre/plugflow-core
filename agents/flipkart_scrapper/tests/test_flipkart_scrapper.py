@@ -132,4 +132,8 @@ def test_health_check_failure(monkeypatch):
     assert health["status"] == "unhealthy", "Expected health status to be 'unhealthy'."
     assert "Mock scraping failure" in health["message"], "Expected failure message in health check."
 
+<<<<<<< Updated upstream
                             
+=======
+                            
+>>>>>>> Stashed changes
