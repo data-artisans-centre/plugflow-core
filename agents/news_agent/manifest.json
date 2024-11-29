@@ -1,9 +1,0 @@
-{
-    "name": "news_agent",
-    "entry_point": "__init__",
-    "description":"This agent uses  ",
-    "category":"StockMarket",
-    "tags":"",
-    "authors":["Ujan Galui <ujan.g570@gmail.com> (～￣▽￣)～"],
-    "class_name": "TickerAgent"
-}

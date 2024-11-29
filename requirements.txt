@@ -13,8 +13,10 @@ pydantic
 yfinance
 
 
-#news_agent
-feedparser
+# Google API Libraries
+google-auth-oauthlib
+google-auth-httplib2
+google-api-python-client
 
 
 
