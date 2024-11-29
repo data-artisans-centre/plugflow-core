@@ -1,6 +1,19 @@
-pytest~=7.4.0
+pytest
+pytest-asyncio
+#dont enforce version :)
 youtube-comment-downloader
 click
 textblob
 pydantic
-requests~=2.31.0
+requests
+
+
+#content_curation_agent
+aiohttp
+newspaper3k
+scholarly
+spacy
+transformers
+beautifulsoup4
+sumy
+lxml[html_clean]
