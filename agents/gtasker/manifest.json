@@ -1,0 +1,9 @@
+{
+    "name": "gtasker",
+    "entry_point": "__init__",
+    "description":"This agent uses google-api's to interface with google-calander,gmail ",
+    "category":"Automation",
+    "tags":"",
+    "authors":["Ujan Galui <ujan.g570@gmail.com> (～￣▽￣)～"],
+    "class_name": "GoogleServicesAgent"
+}
