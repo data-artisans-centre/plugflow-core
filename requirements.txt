@@ -1,6 +1,18 @@
-pytest~=7.4.0
+pytest
 youtube-comment-downloader
 click
+
+#sentiment analysis
 textblob
+
+
+#ticker
+yfinance
+
+
+
+
+
+
 pydantic
-requests~=2.31.0
+requests
