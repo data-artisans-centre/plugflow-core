@@ -1,7 +1,7 @@
 Translator Agent
 =================
 
-The **Translator Agent** is designed to facilitate text translation between languages using a translation API. It supports executing translations, health checks, and retrieving supported languages.
+The **Translator Agent** is designed to facilitate text translation between languages using a translation library from googletrans. It supports executing translations, health checks, and retrieving supported languages.
 
 Features
 --------
@@ -39,9 +39,13 @@ Example Usage
 
 To execute the agent, use the PlugFlow CLI:
 
-.. code-block:: bash
+.. code-block:: vscode terminal
 
     python main.py execute translator --params '{\"text\": \"Hello how are you\", \"target_language\": \"es\"}'
+
+.. code-block:: bash
+
+    python main.py execute translator --params "{\"text\": \"Hello how are you\", \"target_language\": \"es\"}"
 
 Output
 ------

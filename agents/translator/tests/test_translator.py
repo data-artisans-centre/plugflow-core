@@ -1,4 +1,5 @@
 import pytest
+from unittest.mock import MagicMock
 from agents.translator import TranslatorAgent
 
 
@@ -7,34 +8,34 @@ class MockTranslator:
     def translate(self, text, dest):
         supported_languages = ['en', 'es', 'fr', 'de', 'zh-cn', 'ja', 'ar', 'ru', 'pt', 'it']
         
-        # Predefined translations
         translations = {
             "Hello": {"text": "Hola", "src": "en", "dest": "es"},
             "Bonjour": {"text": "Hello", "src": "fr", "dest": "en"}
         }
         
-        # Check if destination language is supported
         if dest not in supported_languages:
             raise ValueError("Unsupported or invalid target language")
         
-        # Check if text has a predefined translation
         if text not in translations:
             raise ValueError("Translation not found")
         
-        # Create mock translation object
-        mock_translation = type('MockTranslation', (), {
-            'text': translations[text]["text"],
-            'src': translations[text]["src"],
-            'dest': translations[text]["dest"]
-        })()
+        mock_translation = type(
+            'MockTranslation', 
+            (), 
+            {
+                'text': translations[text]["text"],
+                'src': translations[text]["src"],
+                'dest': translations[text]["dest"]
+            }
+        )()
         return mock_translation
 
 
 @pytest.fixture
 def translator_agent(monkeypatch):
     """Fixture to initialize TranslatorAgent with a mock translator."""
-    agent = TranslatorAgent()
     monkeypatch.setattr("agents.translator.Translator", MockTranslator)
+    agent = TranslatorAgent()
     return agent
 
 
@@ -50,11 +51,13 @@ def test_execute_success(translator_agent):
 def test_execute_missing_text(translator_agent):
     """Test handling of missing input text."""
     with pytest.raises(ValueError, match="Text cannot be empty."):
-        translator_agent.execute(target_language="es")
+        translator_agent.execute(text="", target_language="es")
 
 
 def test_health_check_success(translator_agent):
     """Test health check success status."""
+    translator_agent.translator.translate = MagicMock(return_value=MockTranslator().translate("Hello", "es"))
+    
     result = translator_agent.health_check()
     assert result["status"] == "healthy"
     assert result["message"] == "Translation service is operational"

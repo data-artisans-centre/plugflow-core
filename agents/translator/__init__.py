@@ -52,32 +52,32 @@ class TranslatorAgent(AgentBase):
         
 
     def health_check(self) -> Dict[str, str]:
-        """
-        Perform a health check on the translation service.
+            """
+            Perform a health check on the translation service.
 
-        Returns:
-            Dict with service health status.
-        """
-        try:
-            logger.info("Performing translator health check...")
+            Returns:
+                Dict with service health status.
+            """
+            try:
+                logger.info("Performing translator health check...")
+                
+                test_translation = self.translator.translate("hello", dest="es")
+                
+                if test_translation and hasattr(test_translation, "text") and test_translation.text:
+                    logger.info("Translation service health check passed.")
+                    return {
+                        "status": "healthy",
+                        "message": "Translation service is operational",
+                    }
+                
+                raise Exception("Translation test failed")
             
-            test_translation = self.translator.translate("hello", dest='es')
-            
-            if test_translation and test_translation.text:
-                logger.info("Translation service health check passed.")
+            except Exception as e:
+                logger.error(f"Translator health check failed: {e}")
                 return {
-                    "status": "healthy", 
-                    "message": "Translation service is operational"
+                    "status": "unhealthy",
+                    "message": str(e),
                 }
-            
-            raise Exception("Translation test failed")
-        
-        except Exception as e:
-            logger.error(f"Translator health check failed: {e}")
-            return {
-                "status": "unhealthy", 
-                "message": str(e)
-            }
 
     def list_supported_languages(self) -> Dict[str, str]:
         """
