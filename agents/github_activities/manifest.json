@@ -1,0 +1,5 @@
+{
+    "name": "github-activities",
+    "entry_point": "__init__",
+    "class_name": "GitHubActivitiesAgent"
+}
