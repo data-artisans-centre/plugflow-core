@@ -1,6 +1,6 @@
 pytest
 pytest-asyncio
-#dont enforce version :)
+#latest pytest is required to get the depcrication warnings :)
 youtube-comment-downloader
 click
 textblob
@@ -17,3 +17,7 @@ transformers
 beautifulsoup4
 sumy
 lxml[html_clean]
+tensorflow
+trafilatura==1.6.2
+httpx
+sentence-transformers
