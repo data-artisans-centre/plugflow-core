@@ -87,7 +87,5 @@ class FlipkartScrapperAgent(AgentBase):
         except Exception as e:
             logger.error(f"Health check failed: {e}")
             return {"status": "unhealthy", "message": str(e)}
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
+
