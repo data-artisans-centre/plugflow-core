@@ -1,7 +1,7 @@
 pytest
 youtube-comment-downloader
 click
-googletrans4.0.0rc1
+googletrans==4.0.0-rc1
 textblob
 pydantic 
 
