@@ -1,6 +1,25 @@
-pytest~=7.4.0
+pytest
 youtube-comment-downloader
 click
+
+#sentiment analysis
 textblob
-pydantic
-requests~=2.31.0
+
+pydantic 
+
+
+
+#ticker
+yfinance
+
+
+# Google API Libraries
+google-auth-oauthlib
+google-auth-httplib2
+google-api-python-client
+
+
+
+
+requests
+
