@@ -11,6 +11,7 @@ requests
 #content_curation_agent
 aiohttp
 newspaper3k
+tf-keras
 scholarly
 spacy
 transformers

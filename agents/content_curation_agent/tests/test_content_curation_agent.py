@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import MagicMock, patch
-from content_curation_agent import ResearchAgent
+from agents.content_curation_agent import ResearchAgent
 from processing.summarization import TextSummarizer
 from sources.scholar import ScholarSearchClient
 from sources.web import WebContentExtractor

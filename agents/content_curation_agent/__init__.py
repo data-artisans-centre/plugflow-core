@@ -2,11 +2,17 @@ import asyncio
 from typing import List, Dict, Any
 from pydantic import BaseModel, Field
 from core.base import AgentBase
-from utils.models import ResearchQuery, ResearchResult
-from sources.scholar import ScholarSearchClient
-from sources.web import WebContentExtractor
-from processing.summarization import TextSummarizer
+#from utils.models import ResearchQuery, ResearchResult
+#from sources.scholar import ScholarSearchClient
+#from sources.web import WebContentExtractor
+#from processing.summarization import TextSummarizer
 from log import logger
+
+from .utils.models import ResearchQuery, ResearchResult
+from .sources.scholar import ScholarSearchClient
+from .sources.web import WebContentExtractor
+from .processing.summarization import TextSummarizer
+
 
 
 class ResearchAnalysis(BaseModel):

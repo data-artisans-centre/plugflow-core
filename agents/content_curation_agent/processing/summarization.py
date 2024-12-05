@@ -1,7 +1,7 @@
 from sentence_transformers import SentenceTransformer
 import numpy as np
 from typing import Optional
-from ..core.exceptions import SummarizationError
+from ..utils.exceptions import SummarizationError
 
 class TextSummarizer:
     """Lightweight text summarization"""
