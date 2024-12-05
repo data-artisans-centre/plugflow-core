@@ -8,10 +8,11 @@ from core.base import AgentBase
 #from processing.summarization import TextSummarizer
 from log import logger
 
-from .utils.models import ResearchQuery, ResearchResult
-from .sources.scholar import ScholarSearchClient
-from .sources.web import WebContentExtractor
-from .processing.summarization import TextSummarizer
+from agents.content_curation_agent.processing.summarization import TextSummarizer
+from agents.content_curation_agent.sources.scholar import ScholarSearchClient
+from agents.content_curation_agent.sources.web import WebContentExtractor
+from log import logger
+
 
 
 
