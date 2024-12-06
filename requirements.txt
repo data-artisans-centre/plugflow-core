@@ -1,6 +1,16 @@
 pytest~=7.4.0
 youtube-comment-downloader
 click
+
 textblob
-pydantic
+
+pydantic 
+beautifulsoup4
+
+
+
 requests~=2.31.0
+
+
+vaderSentiment
+yfinance
