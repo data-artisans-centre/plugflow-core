@@ -1,6 +1,8 @@
-pytest~=7.4.0
+pytest
+pytest-asyncio
 youtube-comment-downloader
 click
 textblob
 pydantic
-requests~=2.31.0
+requests
+python-whois
