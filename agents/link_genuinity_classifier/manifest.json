@@ -1,0 +1,9 @@
+{
+    "name": "link_gen",
+    "entry_point": "__init__",
+    "description":"The program verifies the genuinity and safety of a given URL by performing SSL certificate checks and returning detailed validation results.",
+    "category":"Cyber Security",
+    "tags":"",
+    "authors":["Ujan Galui <ujan.g570@gmail.com>"],
+    "class_name": "LinkGenuinityClassifier"
+}
