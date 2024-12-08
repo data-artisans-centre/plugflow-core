@@ -1,0 +1,39 @@
+{
+    "name": "weather",
+    "description": "Fetch real-time weather information for a given location",
+    "version": "1.0.0",
+    "entry_point": "__init__",
+    "class_name": "WeatherAgent",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "location": {
+                "type": "string",
+                "description": "City name to fetch weather for"
+            },
+            "lat": {
+                "type": "number",
+                "description": "Latitude of the location"
+            },
+            "lon": {
+                "type": "number", 
+                "description": "Longitude of the location"
+            },
+            "units": {
+                "type": "string",
+                "enum": ["M", "I", "S"],
+                "default": "M",
+                "description": "Units for temperature (M: Metric, I: Imperial, S: Scientific)"
+            },
+            "language": {
+                "type": "string",
+                "default": "en",
+                "description": "Language for response"
+            }
+        },
+        "oneOf": [
+            {"required": ["location"]},
+            {"required": ["lat", "lon"]}
+        ]
+    }
+}
