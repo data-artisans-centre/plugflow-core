@@ -6,12 +6,12 @@ from log import logger
 class WeatherAgent(AgentBase):
     """Agent to fetch real-time weather details for a given location."""
 
-    def __init__(self):
+    def __init__(self,api_key):
         """
         Initialize the WeatherAgent with Weatherbit API configuration.
         """
         # You might want to use environment variables or a config file for API key
-        self.api_key = "689a237be98c4abea92f6b3e4e81bb63"  # Replace with actual key
+        self.api_key = api_key  # Replace with actual key
         self.base_url = "https://api.weatherbit.io/v2.0/current"
 
     def execute(self, **kwargs):
