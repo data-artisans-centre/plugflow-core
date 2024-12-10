@@ -1,4 +1,4 @@
-import pytest
+import pytest # type: ignore
 from unittest.mock import patch, MagicMock
 from agents.stock_intraday_analyzer import StockDataFetcher
 

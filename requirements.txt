@@ -12,5 +12,5 @@ beautifulsoup4
 requests~=2.31.0
 
 
-vaderSentiment
+
 yfinance
