@@ -3,6 +3,7 @@ from pydantic import BaseModel, Field, ValidationError, field_validator
 from typing import Dict
 from core.base import AgentBase
 from log import logger
+import re
 
 class CurrencyExchangeRequestModel(BaseModel):
     """
@@ -13,20 +14,13 @@ class CurrencyExchangeRequestModel(BaseModel):
     to_currency: str = Field(..., description="Currency to convert to (e.g., USD, EUR).")
     apikey: str = Field(..., description="Your API key for Alpha Vantage API.")
 
-    @field_validator("from_currency")
-    def validate_from_currency(cls, value):
-        if not (value.isalpha() and 2 <= len(from_currency) <= 4): # type: ignore
-            raise ValueError("from_currency must be a valid currency code consisting of 2-4 letters only.")
-        return value
+    @field_validator("from_currency","to_currency")
+    def validate_to_currency(cls, v):
+        if not re.fullmatch(r"[A-Z]{3}", v):
+            raise ValueError("Currency code must be exactly 3 uppercase letters.")
+        return v
 
-    @field_validator("to_currency")
-    def validate_to_currency(cls, value):
-        if not value.isalpha():
-            raise ValueError("to_currency must be a valid currency code consisting of letters only.")
-        return value
-
-
-class CurrencyExchangeFetcher(AgentBase):
+class CurrencyExchangeAgent(AgentBase):
     """
     Agent to fetch real-time currency exchange rates from Alpha Vantage API.
     """
@@ -35,7 +29,7 @@ class CurrencyExchangeFetcher(AgentBase):
     def execute(self, apikey: str, from_currency: str, to_currency: str) -> Dict:
         """
         Fetch the real-time exchange rate for a currency pair.
-
+        
         Args:
             apikey (str): API key for authentication.
             from_currency (str): The currency to convert from (e.g., USD, BTC).
@@ -48,7 +42,7 @@ class CurrencyExchangeFetcher(AgentBase):
             ValueError: If the request fails, or the response contains errors.
             ValidationError: If input parameters fail validation.
         """
-        # Validate input parameters using Pydantic
+        # Input Validation
         try:
             request_model = CurrencyExchangeRequestModel(
                 from_currency=from_currency,
@@ -57,10 +51,10 @@ class CurrencyExchangeFetcher(AgentBase):
             )
             logger.debug(f"Validated input parameters: {request_model}")
         except ValidationError as e:
-            logger.error(f"Input validation error: {e}")
+            logger.error(f"Input validation failed: {e}")
             raise ValueError(f"Input validation failed: {e}")
 
-        # Prepare request parameters
+        # Prepare API request parameters
         params = {
             "function": request_model.function,
             "from_currency": request_model.from_currency,
@@ -69,16 +63,16 @@ class CurrencyExchangeFetcher(AgentBase):
         }
         logger.info(f"Fetching exchange rate for {from_currency} to {to_currency}")
 
-        # Make the HTTP GET request
+        # Make API Request
         try:
             response = requests.get(self.BASE_URL, params=params)
             response.raise_for_status()
-            logger.debug(f"API response status: {response.status_code}")
+            logger.debug(f"API response status code: {response.status_code}")
         except requests.RequestException as e:
             logger.error(f"Network or API error: {e}")
             raise ValueError(f"Network or API error: {e}")
 
-        # Parse and validate response
+        # Parse and Validate API Response
         json_response = response.json()
         if "Realtime Currency Exchange Rate" not in json_response:
             logger.error("Unexpected API response: Missing 'Realtime Currency Exchange Rate'")
@@ -89,7 +83,7 @@ class CurrencyExchangeFetcher(AgentBase):
 
     def health_check(self, apikey: str) -> Dict:
         """
-        Perform a health check to verify if the API is operational.
+        Perform a health check to verify if the Alpha Vantage API is operational.
 
         Args:
             apikey (str): API key for authentication.
