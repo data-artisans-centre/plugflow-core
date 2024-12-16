@@ -4,5 +4,7 @@ click
 googletrans4.0.0rc1
 textblob
 pydantic 
+requests
+
 
 

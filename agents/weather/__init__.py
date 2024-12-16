@@ -1,17 +1,22 @@
 import requests
 import json
+import sys
+import argparse
+import json
 from core.base import AgentBase
 from log import logger
 
 class WeatherAgent(AgentBase):
     """Agent to fetch real-time weather details for a given location."""
 
-    def __init__(self,api_key):
+    def __init__(self, api_key=None):
         """
         Initialize the WeatherAgent with Weatherbit API configuration.
+        
+        Args:
+            api_key (str, optional): Weatherbit API key. Can be set later.
         """
-        # You might want to use environment variables or a config file for API key
-        self.api_key = api_key  # Replace with actual key
+        self.api_key = api_key
         self.base_url = "https://api.weatherbit.io/v2.0/current"
 
     def execute(self, **kwargs):
@@ -21,6 +26,7 @@ class WeatherAgent(AgentBase):
         Args:
             kwargs (dict): Input arguments containing location details.
             Supported keys:
+            - api_key (str, optional): API key to override the instance key
             - location (str, optional): City name
             - lat (float, optional): Latitude
             - lon (float, optional): Longitude
@@ -31,7 +37,12 @@ class WeatherAgent(AgentBase):
             dict: Comprehensive weather information.
         """
         try:
-            # Extract parameters with defaults
+            api_key = kwargs.get('api_key', self.api_key)
+            
+            if not api_key:
+                raise ValueError("API key must be provided")
+
+            # Params
             location = kwargs.get('location')
             lat = kwargs.get('lat')
             lon = kwargs.get('lon')
@@ -46,7 +57,7 @@ class WeatherAgent(AgentBase):
 
             # Prepare request parameters
             params = {
-                "key": self.api_key,
+                "key": api_key,
                 "units": units,
                 "lang": language
             }
@@ -124,6 +135,9 @@ class WeatherAgent(AgentBase):
             dict: Health status of the agent.
         """
         try:
+            if not self.api_key:
+                return {"status": "unhealthy", "message": "No API key provided"}
+
             logger.info("Performing Weatherbit API health check...")
             
             # Try to fetch weather for a default location (e.g., New York)
