@@ -1,6 +1,24 @@
-pytest~=7.4.0
+pytest
+pytest-asyncio
+#latest pytest is required to get the depcrication warnings :)
 youtube-comment-downloader
 click
 textblob
 pydantic
-requests~=2.31.0
+requests
+
+
+#content_curation_agent
+aiohttp
+newspaper3k
+tf-keras
+scholarly
+spacy
+transformers
+beautifulsoup4
+sumy
+lxml[html_clean]
+tensorflow
+trafilatura==1.6.2
+httpx
+sentence-transformers

@@ -1,0 +1,9 @@
+{
+    "name": "content_curation_agent",
+    "entry_point": "__init__",
+    "description":"This agent curates content",
+    "category":"Research",
+    "tags":"",
+    "authors":["Ujan Galui <ujan.g570@gmail.com>"],
+    "class_name": "YouTubeReviewAnalyzer"
+}
