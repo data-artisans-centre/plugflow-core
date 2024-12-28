@@ -1,110 +1,101 @@
 import requests
 from pydantic import BaseModel, Field, ValidationError, field_validator
-from typing import Dict
+from typing import Optional
 from core.base import AgentBase
 from log import logger
 
-class CurrencyExchangeRequestModel(BaseModel):
-    """
-    Pydantic model for validating currency exchange request parameters.
-    """
-    function: str = Field(default="CURRENCY_EXCHANGE_RATE", description="API function to fetch exchange rate.")
-    from_currency: str = Field(..., description="Currency to convert from (e.g., USD, BTC).")
-    to_currency: str = Field(..., description="Currency to convert to (e.g., USD, EUR).")
-    apikey: str = Field(..., description="Your API key for Alpha Vantage API.")
 
-    @field_validator("from_currency")
-    def validate_from_currency(cls, value):
-        if not (value.isalpha() and 2 <= len(from_currency) <= 4): # type: ignore
-            raise ValueError("from_currency must be a valid currency code consisting of 2-4 letters only.")
+class DailyRequestModel(BaseModel):
+    """Pydantic model for validating daily stock request parameters."""
+    symbol: str = Field(..., description="Stock ticker symbol (e.g., IBM, RELIANCE.BSE)")
+    apikey: str = Field(..., description="API key for Alpha Vantage")
+    outputsize: str = Field("compact", description="Data output size ('compact' or 'full')")
+    datatype: str = Field("json", description="Response format ('json') ")
+
+    @field_validator("outputsize")
+    def validate_outputsize(cls, value):
+        valid_output_sizes = {"compact", "full"}
+        if value not in valid_output_sizes:
+            raise ValueError(f"Invalid outputsize: {value}. Valid options are {valid_output_sizes}.")
         return value
 
-    @field_validator("to_currency")
-    def validate_to_currency(cls, value):
-        if not value.isalpha():
-            raise ValueError("to_currency must be a valid currency code consisting of letters only.")
+    @field_validator("datatype")
+    def validate_datatype(cls, value):
+        valid_datatypes = {"json"}
+        if value not in valid_datatypes:
+            raise ValueError(f"Invalid datatype: {value}. Valid options are {valid_datatypes}.")
         return value
 
 
-class CurrencyExchangeFetcher(AgentBase):
-    """
-    Agent to fetch real-time currency exchange rates from Alpha Vantage API.
-    """
+class StockDailyFetcher(AgentBase):
+    """Agent to fetch daily stock data from Alpha Vantage."""
     BASE_URL = "https://www.alphavantage.co/query"
 
-    def execute(self, apikey: str, from_currency: str, to_currency: str) -> Dict:
+    def execute(self, apikey: str, symbol: str, outputsize: str = "compact", datatype: str = "json") -> str:
         """
-        Fetch the real-time exchange rate for a currency pair.
+        Fetch daily stock data based on the provided parameters.
 
         Args:
-            apikey (str): API key for authentication.
-            from_currency (str): The currency to convert from (e.g., USD, BTC).
-            to_currency (str): The currency to convert to (e.g., USD, EUR).
+            apikey (str): The API key for authentication.
+            symbol (str): The stock symbol (e.g., 'IBM').
+            outputsize (str): The size of the output data ('compact' or 'full').
+            datatype (str): The response format ('json' or 'csv').
 
         Returns:
-            Dict: JSON response containing exchange rate details.
+            str: JSON string or CSV string containing stock data.
 
         Raises:
-            ValueError: If the request fails, or the response contains errors.
-            ValidationError: If input parameters fail validation.
+            ValueError: If the request fails or the symbol is invalid.
         """
-        # Validate input parameters using Pydantic
-        try:
-            request_model = CurrencyExchangeRequestModel(
-                from_currency=from_currency,
-                to_currency=to_currency,
-                apikey=apikey
-            )
-            logger.debug(f"Validated input parameters: {request_model}")
-        except ValidationError as e:
-            logger.error(f"Input validation error: {e}")
-            raise ValueError(f"Input validation failed: {e}")
-
-        # Prepare request parameters
         params = {
-            "function": request_model.function,
-            "from_currency": request_model.from_currency,
-            "to_currency": request_model.to_currency,
-            "apikey": request_model.apikey
+            "function": "TIME_SERIES_DAILY",
+            "symbol": symbol,
+            "outputsize": outputsize,
+            "datatype": datatype,
+            "apikey": apikey,
         }
-        logger.info(f"Fetching exchange rate for {from_currency} to {to_currency}")
 
-        # Make the HTTP GET request
+        logger.debug(f"Constructed URL with parameters: {params}")
+
         try:
             response = requests.get(self.BASE_URL, params=params)
             response.raise_for_status()
-            logger.debug(f"API response status: {response.status_code}")
         except requests.RequestException as e:
-            logger.error(f"Network or API error: {e}")
-            raise ValueError(f"Network or API error: {e}")
+            logger.error("Failed to fetch stock data. Please check the API or network.")
+            raise ValueError("Failed to fetch stock data. Please check the API or network.") from e
 
-        # Parse and validate response
-        json_response = response.json()
-        if "Realtime Currency Exchange Rate" not in json_response:
-            logger.error("Unexpected API response: Missing 'Realtime Currency Exchange Rate'")
-            raise ValueError("Unexpected API response: Missing 'Realtime Currency Exchange Rate'")
+        data = response.json() if datatype == "json" else response.text
 
-        logger.info("Successfully fetched currency exchange rate.")
-        return json_response
+        if "Error Message" in data if datatype == "json" else "Error" in data:
+            logger.error(f"Invalid stock symbol: {symbol}")
+            raise ValueError(f"Invalid stock symbol: {symbol}")
 
-    def health_check(self, apikey: str) -> Dict:
+        logger.info("Successfully fetched daily stock data.")
+        return data
+
+    def health_check(self, apikey: str) -> dict:
         """
-        Perform a health check to verify if the API is operational.
+        Check if the Alpha Vantage API is operational.
 
         Args:
-            apikey (str): API key for authentication.
+            apikey (str): API key for Alpha Vantage.
 
         Returns:
-            Dict: Health status of the API.
+            dict: Health status of the API.
         """
-        logger.info("Performing health check for Alpha Vantage API.")
+        logger.info("Performing health check...")
+
         try:
-            response = self.execute(apikey=apikey, from_currency="USD", to_currency="EUR")
-            if "Realtime Currency Exchange Rate" in response:
-                return {"status": "healthy", "message": "API is operational."}
+            test_result = self.execute(
+                apikey=apikey,
+                symbol="IBM",
+                outputsize="compact",
+                datatype="json"
+            )
+            if "Meta Data" in test_result:
+                return {"status": "healthy", "message": "Service is operational"}
             else:
-                return {"status": "unhealthy", "message": "API response missing expected keys."}
+                return {"status": "unhealthy", "message": "Unexpected API response"}
         except Exception as e:
             logger.error(f"Health check failed: {e}")
             return {"status": "unhealthy", "message": str(e)}
-
