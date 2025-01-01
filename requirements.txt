@@ -3,7 +3,6 @@ youtube-comment-downloader
 click
 textblob
 pydantic
-requests~=2.31.0
 
 
 
