@@ -1,10 +1,6 @@
-pytest
+pytest~=7.4.0
 youtube-comment-downloader
 click
 textblob
 pydantic
 requests~=2.31.0
-
-
-
-
