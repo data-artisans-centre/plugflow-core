@@ -1,10 +1,11 @@
 pytest
 youtube-comment-downloader
 click
-googletrans4.0.0rc1
 textblob
-pydantic 
-requests
+pydantic
+requests~=2.31.0
+
+
 
 
 
