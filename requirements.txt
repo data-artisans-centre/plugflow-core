@@ -3,5 +3,5 @@ youtube-comment-downloader
 click
 googletrans==4.0.0-rc1
 textblob
-pydantic 
+pydantic
 requests~=2.31.0
