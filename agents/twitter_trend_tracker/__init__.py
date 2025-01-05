@@ -1,92 +1,159 @@
-import requests
+import http.client
 import json
 from core.base import AgentBase
 from log import logger
-from .utils import WOEIDLocations
 
-class TwitterTrendingAgent(AgentBase):
-    """Agent to fetch trending tweets using RapidAPI."""
+class TwitterHashtagAgent(AgentBase):
+    """Agent to fetch tweets by hashtag using RapidAPI."""
 
-    def __init__(self):
+    def __init__(self, api_key=None):
         """
-        Initialize the Twitter agent with RapidAPI authentication.
+        Initialize the Twitter hashtag agent with RapidAPI authentication.
+        
+        Args:
+            api_key (str, optional): RapidAPI key. Can be provided during initialization 
+                                   or during execution.
         """
-        self.rapid_api_key = '043ca59f1fmsh4888cbf47d4856bp1a242ajsn9fbcf042a9b0'
-        self.rapid_api_host = 'twitter-x.p.rapidapi.com'
+        self.rapid_api_key = api_key
+        self.rapid_api_host = "twitter154.p.rapidapi.com"
+        self.base_url = "twitter154.p.rapidapi.com"
 
-        self.headers = {
-            "X-RapidAPI-Key": self.rapid_api_key,
-            "X-RapidAPI-Host": self.rapid_api_host
+    def format_tweet(self, tweet):
+        """
+        Format a single tweet into the desired structured output.
+        
+        Args:
+            tweet (dict): Raw tweet data.
+        
+        Returns:
+            str: Formatted tweet as a string.
+        """
+        tweet_id = tweet.get("tweet_id", "N/A")
+        creation_date = tweet.get("creation_date", "N/A")
+        text = tweet.get("text", "N/A")
+        media = tweet.get("media_url", [])
+        video_urls = tweet.get("video_url", [])
+        user = tweet.get("user", {})
+        
+        user_details = {
+            "Username": user.get("username", "N/A"),
+            "Name": user.get("name", "N/A"),
+            "Followers": user.get("follower_count", "N/A"),
+            "Following": user.get("following_count", "N/A"),
+            "Location": user.get("location", "N/A"),
+            "Description": user.get("description", "N/A"),
+            "Profile Picture": user.get("profile_pic_url", "N/A")
         }
-        self.base_url = "https://twitter-x.p.rapidapi.com/trends/"
+        
+        engagements = {
+            "Favorites": tweet.get("favorite_count", "N/A"),
+            "Retweets": tweet.get("retweet_count", "N/A"),
+            "Replies": tweet.get("reply_count", "N/A"),
+            "Views": tweet.get("view_count", "N/A")
+        }
+        
+        # Format the tweet details
+        formatted_tweet = f"""
+### Tweet
+Tweet ID: {tweet_id}  
+Creation Date: {creation_date}  
+Text:  
+{text}  
+
+Media:
+""" 
+        for idx, media_url in enumerate(media, 1):
+            formatted_tweet += f"- Media {idx}: ![Image]({media_url})\n"
+        
+        if video_urls:
+            formatted_tweet += "\n Videos:\n"
+            for video in video_urls:
+                if video.get("content_type") == "video/mp4":
+                    bitrate = video.get("bitrate", "N/A")
+                    url = video.get("url", "N/A")
+                    formatted_tweet += f"- [Quality {bitrate} kbps]({url})\n"
+
+        formatted_tweet += "\nUser Details:\n"
+        for key, value in user_details.items():
+            formatted_tweet += f"- {key}: {value}\n"
+
+        formatted_tweet += "\n Engagements: \n"
+        for key, value in engagements.items():
+            formatted_tweet += f"- {key}: {value}\n"
+
+        return formatted_tweet.strip()
 
     def execute(self, **kwargs):
         """
-        Fetch trending tweets based on keyword arguments with country name.
+        Fetch tweets based on hashtag.
         
         Args:
-            kwargs (dict): Input arguments containing 'country' and 'max_trends'.
+            kwargs (dict): Input arguments containing:
+                - hashtag (str): Hashtag to search for (required)
+                - api_key (str): RapidAPI key (required if not provided during init)
+                - limit (int): Maximum number of tweets to fetch (default: 20)
+                - section (str): Section to search in (default: 'top')
+                - language (str): Language code (default: 'en')
             
         Returns:
-            dict: A dictionary containing trending topics and location information.
+            str: Formatted tweets.
         """
         try:
-            # Parse input parameters
-            country_name = kwargs.get("country", "").strip()
-            max_trends = kwargs.get("max_trends", 10)
+            # Getting the  parameters
+            hashtag = kwargs.get("hashtag")
+            if not hashtag:
+                raise ValueError("Hashtag parameter is required")
 
-            # Find location by country name
-            selected_location = WOEIDLocations.find_location_by_name(country_name)
+            # Passsing the API in runtime 
+            self.rapid_api_key = kwargs.get("api_key", self.rapid_api_key)
+            if not self.rapid_api_key:
+                raise ValueError("API key must be provided either during initialization or execution")
 
-            if not selected_location:
-                raise ValueError(f"No WOEID found for country: {country_name}")
+            limit = kwargs.get("limit", 20)
+            section = kwargs.get("section", "top")
+            language = kwargs.get("language", "en")
 
-            woeid = selected_location["woeid"]
+            # Preparing the payload
+            payload = json.dumps({
+                "hashtag": hashtag,
+                "limit": limit,
+                "section": section,
+                "language": language
+            })
 
-            logger.info(f"Fetching trending tweets for {selected_location['name']} (WOEID: {woeid})")
-
-            # API endpoint for trends by WOEID
-            url = f"{self.base_url}by_woeid/"
-            querystring = {"woeid": woeid}
-
-            response = requests.get(url, headers=self.headers, params=querystring)
-
-            # Check if the request was successful
-            if response.status_code != 200:
-                raise ValueError(f"API request failed with status code {response.status_code}")
-
-            # Parse the response
-            trends_data = response.json()
-
-            # Process and limit trends
-            processed_trends = []
-            for trend in trends_data[:max_trends]:
-                trend_info = {
-                    "name": trend.get("name", ""),
-                    "tweet_volume": trend.get("tweet_volume", 0),
-                    "url": trend.get("url", ""),
-                    "promoted_content": trend.get("promoted_content", False),
-                }
-                processed_trends.append(trend_info)
-
-            # Prepare return dictionary
-            result = {
-                "location": {
-                    "name": selected_location["name"],
-                    "country": selected_location["country"],
-                    "woeid": woeid,
-                },
-                "trends": processed_trends,
+            # Setting up  the headers
+            headers = {
+                'x-rapidapi-key': self.rapid_api_key,
+                'x-rapidapi-host': self.rapid_api_host,
+                'Content-Type': "application/json"
             }
 
-            # Log the results
-            logger.info(f"Fetched {len(processed_trends)} trending topics")
+            logger.info(f"Fetching tweets for hashtag: {hashtag}")
 
-            return result
+            # Making the request
+            conn = http.client.HTTPSConnection(self.base_url)
+            conn.request("POST", "/hashtag/hashtag", payload, headers)
+            
+            response = conn.getresponse()
+            data = response.read()
+            
+            # Check if the request was successful
+            if response.status != 200:
+                raise ValueError(f"API request failed with status code {response.status}")
+
+            result = json.loads(data.decode("utf-8"))
+            tweets = result.get("results", [])
+            
+            # Format the tweets
+            formatted_tweets = "\n\n---\n\n".join([self.format_tweet(tweet) for tweet in tweets])
+            return formatted_tweets
 
         except Exception as e:
-            logger.error(f"An error occurred while fetching trends: {e}")
+            logger.error(f"An error occurred while fetching tweets: {e}")
             return {"error": str(e), "status": "failed"}
+        finally:
+            if 'conn' in locals():
+                conn.close()
 
     def health_check(self):
         """
@@ -96,20 +163,24 @@ class TwitterTrendingAgent(AgentBase):
             dict: Health status of the plugin.
         """
         try:
-            logger.info("Performing RapidAPI Twitter health check...")
+            logger.info("Performing RapidAPI Twitter hashtag search health check...")
             
-            # Try to fetch global trends as a basic connectivity test
-            url = f"{self.base_url}by_woeid/"
-            querystring = {"woeid": 1}  # Global trends
+            # Try a simple test search if API key is available
+            if not self.rapid_api_key:
+                return {"status": "unknown", "message": "API key not provided"}
+                
+            result = self.execute(
+                hashtag="#test",
+                api_key=self.rapid_api_key,
+                limit=1
+            )
             
-            response = requests.get(url, headers=self.headers, params=querystring)
-            
-            if response.status_code == 200:
-                logger.info("RapidAPI Twitter health check passed.")
+            if "error" not in result:
+                logger.info("RapidAPI Twitter hashtag search health check passed.")
                 return {"status": "healthy", "message": "Twitter API service is available"}
             else:
-                raise ValueError(f"Health check failed with status code {response.status_code}")
-        
+                raise ValueError(result["error"])
+            
         except Exception as e:
-            logger.error(f"RapidAPI Twitter health check failed: {e}")
+            logger.error(f"RapidAPI Twitter hashtag search health check failed: {e}")
             return {"status": "unhealthy", "message": str(e)}
