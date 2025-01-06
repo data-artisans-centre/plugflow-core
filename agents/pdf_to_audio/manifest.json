@@ -1,0 +1,5 @@
+{
+    "name": "pdf_to_audio",
+    "entry_point": "__init__",
+    "class_name": "PdfToAudioAgent"
+}
