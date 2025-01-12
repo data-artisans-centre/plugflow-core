@@ -2,7 +2,7 @@ import json
 from typing import Dict, Any, Union, Tuple
 from core.base import AgentBase
 from log import logger
-import PyPDF2
+import pypdf
 import pyttsx3
 import io
 
@@ -20,7 +20,7 @@ class PdfToAudioAgent(AgentBase):
         """
         try:
             with open(pdf_path, "rb") as file:
-                reader = PyPDF2.PdfReader(file)
+                reader = pypdf.PdfReader(file)
                 text = ""
                 for page in reader.pages:
                     text += page.extract_text()
@@ -37,7 +37,7 @@ class PdfToAudioAgent(AgentBase):
         try:
             # Configure voice settings
             voices = self.engine.getProperty('voices')
-            self.engine.setProperty('voice', voices[1].id)  # Index 1 is usually a female voice
+            self.engine.setProperty('voice', voices[1].id)  # Index 1 -> a female voice
             self.engine.setProperty('rate', 150)  # Speed of speech
             self.engine.setProperty('volume', 0.9)  # Volume level
             
