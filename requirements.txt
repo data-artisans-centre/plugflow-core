@@ -7,3 +7,5 @@ pydantic
 requests~=2.31.0
 pypdf==5.1.0
 pyttsx3==2.98
+
+
