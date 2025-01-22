@@ -1,0 +1,9 @@
+{
+    "name": "bin_checker",
+    "entry_point": "__init__",
+    "description":"This Python module uses the first 6 digits of an issuer card to retrieve the relevant information regarding card and bank.",
+    "category":"Finance",
+    "tags":"",
+    "authors":["Nilanjana Dey <nilanjanadey276@gmail.com>"],
+    "class_name": "BINCheckerAgent"
+}
