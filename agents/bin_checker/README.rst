@@ -56,7 +56,7 @@ The plugin returns a JSON object containing the following fields:
 - ``country``: The country where the card was issued.
 - ``scheme``: The payment scheme (e.g., Visa, Mastercard).
 - ``type``: The type of card (e.g., credit, debit).
-- ``url``: The latitude of the issuing bank's location (if available).
+- ``url``: The website of the bank.
 
 Example:
 
