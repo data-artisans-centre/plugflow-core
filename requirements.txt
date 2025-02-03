@@ -4,6 +4,4 @@ click
 googletrans==4.0.0-rc1
 textblob
 pydantic
-pypdf==5.1.0
-pyttsx3==2.98
 requests~=2.31.0
