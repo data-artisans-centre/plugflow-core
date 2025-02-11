@@ -1,0 +1,9 @@
+{
+    "name": "url2pdf",
+    "entry_point": "__init__",
+    "description":"This Python module uses the first 6 digits of an issuer card to retrieve the relevant information regarding card and bank.",
+    "category":"File Conversion",
+    "tags":"",
+    "authors":["Nilanjana Dey <nilanjanadey276@gmail.com>"],
+    "class_name": "URLToPDFConverter"
+}
