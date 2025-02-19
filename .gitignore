@@ -5,3 +5,4 @@ __pycache__/
 env
 .vscode/settings.json
 pdf/
+pdf_to_audio/*
