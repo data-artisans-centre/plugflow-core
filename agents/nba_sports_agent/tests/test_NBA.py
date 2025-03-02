@@ -1,7 +1,7 @@
 import pytest
 import json
 from unittest.mock import patch, MagicMock
-from agents.football_sports_agent import SportsAgent
+from agents.nba_sports_agent import SportsAgent
 
 
 @pytest.fixture
@@ -10,7 +10,7 @@ def sports_agent():
     return SportsAgent()
 
 
-@patch("agents.football_sports_agent.requests.get")
+@patch("agents.nba_sports_agent.requests.get")
 def test_health_check_success(mock_get, sports_agent):
     """Test health check returns a healthy status."""
     mock_response = MagicMock()
@@ -22,7 +22,7 @@ def test_health_check_success(mock_get, sports_agent):
     assert result["status"] == "healthy"
 
 
-@patch("agents.football_sports_agent.requests.get")
+@patch("agents.nba_sports_agent.requests.get")
 def test_health_check_failure(mock_get, sports_agent):
     """Test health check returns an unhealthy status on failure."""
     mock_response = MagicMock()
@@ -35,7 +35,7 @@ def test_health_check_failure(mock_get, sports_agent):
     assert "Invalid API key" in result["error"]
 
 
-@patch("agents.football_sports_agent.requests.get")
+@patch("agents.nba_sports_agent.requests.get")
 def test_execute_success(mock_get, sports_agent):
     """Test successful execution of API call."""
     mock_response = MagicMock()
@@ -49,7 +49,7 @@ def test_execute_success(mock_get, sports_agent):
     mock_get.assert_called()
 
 
-@patch("agents.football_sports_agent.requests.get")
+@patch("agents.nba_sports_agent.requests.get")
 def test_execute_invalid_category(mock_get, sports_agent):
     """Test execution with invalid category input."""
     with patch("builtins.input", side_effect=["100"]):
@@ -57,7 +57,7 @@ def test_execute_invalid_category(mock_get, sports_agent):
             sports_agent.execute(apikey="test_api_key")
 
 
-@patch("agents.football_sports_agent.requests.get")
+@patch("agents.nba_sports_agent.requests.get")
 def test_execute_invalid_api_key(mock_get, sports_agent):
     """Test execution with an invalid API key."""
     mock_response = MagicMock()

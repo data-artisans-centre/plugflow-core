@@ -89,7 +89,7 @@ Run all tests:
 
 .. code-block:: bash
 
-    pytest tests/football_sports_agent/tests
+    pytest agents/football_sports_agent/tests
 
 Contributing
 ------------
