@@ -10,3 +10,4 @@ textblob
 yfinance
 pydantic
 
+yfinance
