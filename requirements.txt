@@ -1,6 +1,12 @@
-pytest~=7.4.0
+pytest
 youtube-comment-downloader
 click
-textblob
-pydantic
+beautifulsoup4
 requests~=2.31.0
+#sentiment analysis
+googletrans==4.0.0-rc1
+textblob
+#ticker
+yfinance
+pydantic
+
