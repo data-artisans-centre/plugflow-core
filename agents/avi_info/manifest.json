@@ -1,0 +1,10 @@
+{
+    "name": "avi_info",
+    "entry_point": "__init__",
+    "description":"This Python module is designed to retrieve real-time information regarding airports,airlines,etc using the AviationStack API.",
+    "category":"Aviation",
+    "tags":"",
+    "authors":["Nilanjana Dey <nilanjanadey276@gmail.com>"],
+    "class_name": "AviationDataFetcher"
+}
+
