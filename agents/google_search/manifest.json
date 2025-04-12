@@ -1,0 +1,9 @@
+{
+    "name": "google_search",
+    "entry_point": "__init__",
+    "class_name": "Search",
+    "description":"Allows you to scrape the results from Google search engine via SerpApi service.",
+    "category":" Web scraping and search engine data retrieval",
+    "author":["Kanishk Saleria <kanishksaleriamain@gmail.com>"]
+}
+

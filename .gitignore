@@ -3,5 +3,5 @@ __pycache__/
 .idea/
 .idea/*
 env
-.vscode/settings.json
-pdf/
+.vscode/
+
