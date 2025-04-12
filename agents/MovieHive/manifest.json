@@ -1,0 +1,5 @@
+{
+    "name": "MovieHive",
+    "entry_point": "__init__",
+    "class_name": "MovieHiveAgent"
+}
