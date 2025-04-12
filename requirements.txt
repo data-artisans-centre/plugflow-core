@@ -1,7 +1,15 @@
 pytest~=7.4.0
 youtube-comment-downloader
 click
+beautifulsoup4
+requests~=2.31.0
+#sentiment analysis
 googletrans==4.0.0-rc1
 textblob
+#ticker
+yfinance
+google-auth-oauthlib
+google-auth-httplib2
+google-api-python-client
 pydantic
-requests~=2.31.0
+
