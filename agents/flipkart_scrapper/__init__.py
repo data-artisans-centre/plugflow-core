@@ -6,6 +6,7 @@ from typing import List, Optional
 from itertools import islice
 from core.base import AgentBase
 from log import logger
+import random
 
 
 class Product(BaseModel):
@@ -42,7 +43,18 @@ class FlipkartScrapperAgent(AgentBase):
         logger.debug(f"Constructed Search URL: {search_url}")
 
         try:
-            response = requests.get(search_url, headers={'User-Agent': 'Mozilla/5.0'})
+            user_agents = [
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Firefox/89.0',
+            ]
+
+            headers = {
+                'User-Agent': random.choice(user_agents)
+            }
+
+            response = requests.get(search_url, headers=headers)
+
+            #response = requests.get(search_url, headers={'User-Agent': 'Mozilla/5.0'})
             response.raise_for_status()
         except requests.RequestException as e:
             logger.error("Failed to fetch product details. Please check the URL or network.")
