@@ -7,33 +7,19 @@
     "input_schema": {
         "type": "object",
         "properties": {
-            "location": {
+            "api_key": {
+                "type": "string",
+                "description": "RapidAPI key for Open Weather API"
+            },
+            "city": {
                 "type": "string",
                 "description": "City name to fetch weather for"
             },
-            "lat": {
-                "type": "number",
-                "description": "Latitude of the location"
-            },
-            "lon": {
-                "type": "number", 
-                "description": "Longitude of the location"
-            },
-            "units": {
+            "country_code": {
                 "type": "string",
-                "enum": ["M", "I", "S"],
-                "default": "M",
-                "description": "Units for temperature (M: Metric, I: Imperial, S: Scientific)"
-            },
-            "language": {
-                "type": "string",
-                "default": "en",
-                "description": "Language for response"
+                "description": "Two-letter country code (optional)"
             }
         },
-        "oneOf": [
-            {"required": ["location"]},
-            {"required": ["lat", "lon"]}
-        ]
+        "required": ["city"]
     }
 }

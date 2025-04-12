@@ -1,220 +1,154 @@
 import pytest
-from unittest.mock import MagicMock, patch
 import requests
-from agents.weather import WeatherAgent  # Adjust import based on your project structure
-
-class MockResponse:
-    """Mock response class to simulate API responses."""
-    def __init__(self, json_data, status_code=200):
-        self.json_data = json_data
-        self.status_code = status_code
-
-    def json(self):
-        return self.json_data
-
+from unittest.mock import Mock, patch
+from agents.weather import WeatherAgent
 
 @pytest.fixture
-def weather_agent():
-    """Fixture to create a WeatherAgent instance with a mock API key."""
-    return WeatherAgent("mock_api_key")
-
-
-def test_execute_by_city_success(weather_agent):
-    """Test successful weather fetch by city name."""
-    # Mock API response
-    mock_response = {
-        "data": [{
-            "city_name": "New York",
-            "country_code": "US",
-            "lat": 40.7128,
-            "lon": -74.0060,
-            "temp": 22.5,
-            "app_temp": 25.0,
-            "weather": {
-                "description": "Partly cloudy",
-                "code": 802,
-                "icon": "c02d"
-            },
-            "wind_spd": 3.1,
-            "wind_dir": 180,
-            "wind_cdir_full": "South",
-            "rh": 65,
-            "pres": 1015.2,
-            "slp": 1016.5,
-            "clouds": 40,
-            "vis": 10,
-            "solar_rad": 500,
-            "uv": 5,
-            "aqi": 50
-        }]
-    }
-
-    with patch('requests.get', return_value=MockResponse(mock_response)) as mock_get:
-        result = weather_agent.execute(location="New York")
-        
-        # Verify API call
-        mock_get.assert_called_once()
-        args, kwargs = mock_get.call_args
-        assert kwargs['params']['city'] == "New York"
-        
-        # Verify result structure and values
-        assert result['location']['name'] == "New York"
-        assert result['location']['country'] == "US"
-        assert result['temperature']['current'] == 22.5
-        assert result['weather']['description'] == "Partly cloudy"
-
-
-def test_execute_by_coordinates_success(weather_agent):
-    """Test successful weather fetch by latitude and longitude."""
-    mock_response = {
-        "data": [{
-            "city_name": "Mountain View",
-            "country_code": "US",
-            "lat": 37.3861,
-            "lon": -122.0839,
+def mock_weather_response():
+    """Fixture to create a mock weather response object."""
+    mock = Mock()
+    mock.status_code = 200
+    mock.json.return_value = {
+        "main": {
             "temp": 20.5,
-            "app_temp": 22.0,
-            "weather": {
-                "description": "Clear sky",
-                "code": 800,
-                "icon": "01d"
-            },
-            "wind_spd": 2.5,
-            "wind_dir": 270,
-            "wind_cdir_full": "West",
-            "rh": 55,
-            "pres": 1010.1,
-            "slp": 1011.3,
-            "clouds": 0,
-            "vis": 16,
-            "solar_rad": 800,
-            "uv": 7,
-            "aqi": 35
-        }]
-    }
-
-    with patch('requests.get', return_value=MockResponse(mock_response)) as mock_get:
-        result = weather_agent.execute(lat=37.3861, lon=-122.0839)
-        
-        # Verify API call
-        mock_get.assert_called_once()
-        args, kwargs = mock_get.call_args
-        assert kwargs['params']['lat'] == 37.3861
-        assert kwargs['params']['lon'] == -122.0839
-        
-        # Verify result structure and values
-        assert result['location']['latitude'] == 37.3861
-        assert result['location']['longitude'] == -122.0839
-        assert result['weather']['description'] == "Clear sky"
-
-def test_execute_api_error(weather_agent):
-    """Test handling of API request failure."""
-    with patch('requests.get', return_value=MockResponse({}, status_code=401)) as mock_get:
-        result = weather_agent.execute(location="New York")
-        
-        assert result['status'] == 'failed'
-        assert 'error' in result
-
-def test_execute_extreme_weather(weather_agent):
-    """Test handling of extreme weather data."""
-    mock_response = {
-        "data": [{
-            "city_name": "Extreme City",
-            "temp": -50.0,  # Extremely low temperature
-            "wind_spd": 100.0,  # Extremely high wind speed
-            "weather": {
-                "description": "Extreme conditions",
-                "code": 900  # Hypothetical extreme weather code
+            "feels_like": 19.8,
+            "temp_min": 18.9,
+            "temp_max": 22.1,
+            "humidity": 65,
+            "pressure": 1012
+        },
+        "weather": [
+            {
+                "main": "Clouds",
+                "description": "scattered clouds",
+                "icon": "03d"
             }
-        }]
+        ],
+        "wind": {
+            "speed": 3.1,
+            "deg": 240
+        },
+        "clouds": {
+            "all": 40
+        },
+        "visibility": 10000,
+        "sys": {
+            "country": "GB"
+        }
     }
+    return mock
 
-    with patch('requests.get', return_value=MockResponse(mock_response)) as mock_get:
-        result = weather_agent.execute(location="Extreme City")
-        
-        assert result['location']['name'] == "Extreme City"
-        assert result['temperature']['current'] == -50.0
-        assert result['weather']['description'] == "Extreme conditions"
+@pytest.fixture
+def weather_agent(monkeypatch, mock_weather_response):
+    """Fixture to initialize WeatherAgent with mocked requests."""
+    agent = WeatherAgent(api_key="test_api_key")
+    monkeypatch.setattr(requests, "get", Mock(return_value=mock_weather_response))
+    return agent
 
-
-def test_execute_no_data(weather_agent):
-    """Test handling of API response with no data or empty response."""
-    # Scenario 1: Empty data list
-    mock_response_empty = {"data": []}
+def test_execute_success(weather_agent):
+    """Test successful weather fetching."""
+    result = weather_agent.execute(city="London", country_code="GB")
     
-    with patch('requests.get', return_value=MockResponse(mock_response_empty)) as mock_get:
-        result = weather_agent.execute(location="Non-existent City")
-        assert result['status'] == 'failed'
-        assert 'No weather data found' in result['error']
+    assert result["location"]["name"] == "London"
+    assert result["location"]["country"] == "GB"
+    assert result["temperature"]["current"] == 20.5
+    assert result["weather"]["description"] == "scattered clouds"
+    assert result["humidity"] == 65
 
-    # Scenario 2: Completely empty response
-    mock_response_none = {}
+def test_execute_empty_city(weather_agent):
+    """Test execution with empty city."""
+    result = weather_agent.execute(city="", country_code="GB")
     
-    with patch('requests.get', return_value=MockResponse(mock_response_none)) as mock_get:
-        result = weather_agent.execute(location="Another Non-existent City")
-        assert result['status'] == 'failed'
-        assert 'No weather data found' in result['error']
+    assert "error" in result
+    assert "City name cannot be empty" in result["error"]
+    assert result["status"] == "failed"
 
-    # Scenario 3: Simulating connection error or None response
-    with patch('requests.get', side_effect=requests.exceptions.RequestException("Connection error")) as mock_get:
-        result = weather_agent.execute(location="Yet Another City")
-        assert result['status'] == 'failed'
-        assert 'Connection error' in result['error']
+def test_execute_missing_api_key(monkeypatch, mock_weather_response):
+    """Test execution with missing API key."""
+    agent = WeatherAgent()  # No API key provided
+    monkeypatch.setattr(requests, "get", Mock(return_value=mock_weather_response))
+    
+    result = agent.execute(city="London", country_code="GB")
+    
+    assert "error" in result
+    assert "API key must be provided" in result["error"]
+    assert result["status"] == "failed"
 
+def test_execute_api_error(weather_agent, monkeypatch):
+    """Test execution when API returns an error."""
+    mock_error_response = Mock()
+    mock_error_response.status_code = 404
+    mock_error_response.json.return_value = {"message": "City not found"}
+    monkeypatch.setattr(requests, "get", Mock(return_value=mock_error_response))
+    
+    result = weather_agent.execute(city="NonExistentCity", country_code="XX")
+    
+    assert "error" in result
+    assert "API error: City not found" in result["error"] or "API request failed with status code 404" in result["error"]
+    assert result["status"] == "failed"
+
+def test_execute_request_exception(weather_agent, monkeypatch):
+    """Test execution when request raises an exception."""
+    def mock_request(*args, **kwargs):
+        raise requests.RequestException("Connection error")
+    
+    monkeypatch.setattr(requests, "get", mock_request)
+    
+    result = weather_agent.execute(city="London", country_code="GB")
+    
+    assert "error" in result
+    assert "Connection error" in result["error"]
+    assert result["status"] == "failed"
 
 def test_health_check_success(weather_agent):
-    """Test health check functionality."""
-    # Create a successful mock response
-    mock_response = {
-        "data": [{
-            "city_name": "New York",
-            "temp": 22.5
-        }]
-    }
+    """Test successful health check."""
+    health = weather_agent.health_check()
+    
+    assert health["status"] == "healthy"
+    assert "Open Weather API service is available" in health["message"]
 
-    with patch('requests.get', return_value=MockResponse(mock_response)) as mock_get:
-        result = weather_agent.health_check()
-        
-        # Verify API call was made
-        mock_get.assert_called_once()
-        
-        # Verify health check result
-        assert result['status'] == "healthy"
-        assert result['message'] == "Weatherbit API service is available"
+def test_health_check_failure(weather_agent, monkeypatch):
+    """Test health check failure."""
+    def mock_request(*args, **kwargs):
+        raise requests.RequestException("Service unavailable")
+    
+    monkeypatch.setattr(requests, "get", mock_request)
+    
+    health = weather_agent.health_check()
+    
+    assert health["status"] == "unhealthy"
+    assert "Service unavailable" in health["message"]
+
+def test_health_check_api_error(weather_agent, monkeypatch):
+    """Test health check when API returns an error."""
+    mock_error_response = Mock()
+    mock_error_response.status_code = 401
+    mock_error_response.json.return_value = {"message": "Invalid API key"}
+    monkeypatch.setattr(requests, "get", Mock(return_value=mock_error_response))
+    
+    health = weather_agent.health_check()
+    
+    assert health["status"] == "unhealthy"
+    assert "Health check failed" in health["message"]
 
 
-def test_health_check_failure(weather_agent):
-    """Test health check failure scenario."""
-    with patch('requests.get', side_effect=Exception("Connection error")) as mock_get:
-        result = weather_agent.health_check()
-        
-        # Verify health check result for failure
-        assert result['status'] == "unhealthy"
-        assert "Connection error" in result['message']
-
-
-@pytest.mark.parametrize("units,language", [
-    ('M', 'en'),   # Metric units, English
-    ('I', 'es'),   # Imperial units, Spanish
-    ('M', 'fr')    # Metric units, French
-])
-def test_execute_units_and_language(weather_agent, units, language):
-    """Test different unit and language configurations."""
-    mock_response = {
-        "data": [{
-            "city_name": "Test City",
-            "temp": 22.5,
-            "weather": {"description": "Test description"}
-        }]
-    }
-
-    with patch('requests.get', return_value=MockResponse(mock_response)) as mock_get:
-        result = weather_agent.execute(location="Test City", units=units, language=language)
-        
-        # Verify API call parameters
-        args, kwargs = mock_get.call_args
-        assert kwargs['params']['units'] == units
-        assert kwargs['params']['lang'] == language
-        
-        # Basic result validation
-        assert result['location']['name'] == "Test City"
+def test_execute_invalid_location(weather_agent, monkeypatch):
+    """Test weather fetching with invalid location or country code."""
+    # Mock an error response for invalid location
+    mock_error_response = Mock()
+    mock_error_response.status_code = 404
+    mock_error_response.json.return_value = {"message": "City not found"}
+    monkeypatch.setattr(requests, "get", Mock(return_value=mock_error_response))
+    
+    # Test with invalid city
+    result = weather_agent.execute(city="NonExistentCity", country_code="IN")
+    
+    assert result["status"] == "failed"
+    assert "error" in result
+    assert "not found" in result["error"].lower() or "404" in result["error"]
+    
+    # Test with invalid country code
+    result = weather_agent.execute(city="Coimbatore", country_code="XX")
+    
+    assert result["status"] == "failed"
+    assert "error" in result

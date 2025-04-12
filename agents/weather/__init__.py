@@ -1,159 +1,148 @@
 import requests
-import json
-import sys
-import argparse
-import json
-from core.base import AgentBase
+from typing import Dict, Any, Optional
 from log import logger
+from core.base import AgentBase
 
 class WeatherAgent(AgentBase):
-    """Agent to fetch real-time weather details for a given location."""
-
-    def __init__(self, api_key=None):
+    """Agent to fetch weather data using the Open Weather API from RapidAPI."""
+    
+    def __init__(self, api_key: Optional[str] = None):
         """
-        Initialize the WeatherAgent with Weatherbit API configuration.
+        Initialize the WeatherAgent with RapidAPI configuration.
         
         Args:
-            api_key (str, optional): Weatherbit API key. Can be set later.
+            api_key (str, optional): RapidAPI key
         """
         self.api_key = api_key
-        self.base_url = "https://api.weatherbit.io/v2.0/current"
-
-    def execute(self, **kwargs):
+        self.base_url = "https://open-weather13.p.rapidapi.com"
+        self.host = "open-weather13.p.rapidapi.com"
+    
+    def execute(self, **kwargs) -> Dict[str, Any]:
         """
-        Fetch weather details based on input parameters.
+        Fetch weather details for the specified city.
         
         Args:
-            kwargs (dict): Input arguments containing location details.
-            Supported keys:
-            - api_key (str, optional): API key to override the instance key
-            - location (str, optional): City name
-            - lat (float, optional): Latitude
-            - lon (float, optional): Longitude
-            - units (str, optional): 'M' for Metric, 'I' for Imperial
-            - language (str, optional): Language code
-
+            **kwargs: Keyword arguments including:
+                - api_key (str, optional): API key to override the instance key
+                - city (str): Name of the city
+                - country_code (str, optional): Two-letter country code
+        
         Returns:
-            dict: Comprehensive weather information.
+            dict: A dictionary containing the weather data or an error message.
         """
         try:
             api_key = kwargs.get('api_key', self.api_key)
             
             if not api_key:
                 raise ValueError("API key must be provided")
-
-            # Params
-            location = kwargs.get('location')
-            lat = kwargs.get('lat')
-            lon = kwargs.get('lon')
-            units = kwargs.get('units', 'M')
-            language = kwargs.get('language', 'en')
-
-            # Validate input - must have either location or lat/lon
-            if not location and (lat is None or lon is None):
-                raise ValueError("Either location or lat/lon must be provided")
-
-            logger.info(f"Fetching weather for location: {location or f'Lat: {lat}, Lon: {lon}'}")
-
-            # Prepare request parameters
-            params = {
-                "key": api_key,
-                "units": units,
-                "lang": language
+            
+            city = kwargs.get('city', '').strip()
+            country_code = kwargs.get('country_code', '').strip()
+            
+            if not city:
+                raise ValueError("City name cannot be empty")
+            
+            logger.info(f"Fetching weather for city: {city}")
+            
+            # Prepare request headers
+            headers = {
+                'x-rapidapi-key': api_key,
+                'x-rapidapi-host': self.host
             }
-
-            # Add location parameters
-            if location:
-                params["city"] = location
-            elif lat is not None and lon is not None:
-                params["lat"] = lat
-                params["lon"] = lon
-
+            
+            # Prepare URL
+            if country_code:
+                url = f"{self.base_url}/city/{city}/{country_code}"
+            else:
+                url = f"{self.base_url}/city/{city}"
+            
             # Make API request
-            response = requests.get(self.base_url, params=params)
-
-            # Check if the request was successful
-            if response.status_code != 200:
-                raise ValueError(f"API request failed with status code {response.status_code}")
-
-            # Parse JSON response
-            weather_data = response.json()
-
-            # Check if data is available
-            if not weather_data.get('data'):
-                raise ValueError("No weather data found")
-
-            # Extract the first observation
-            obs = weather_data['data'][0]
-
-            # Parse weather information
-            result = {
-                "location": {
-                    "name": obs.get("city_name", "Unknown"),
-                    "country": obs.get("country_code", "Unknown"),
-                    "latitude": obs.get("lat"),
-                    "longitude": obs.get("lon")
-                },
-                "temperature": {
-                    "current": obs.get("temp"),
-                    "feels_like": obs.get("app_temp")
-                },
-                "weather": {
-                    "description": obs.get("weather", {}).get("description", "Unknown"),
-                    "code": obs.get("weather", {}).get("code"),
-                    "icon": obs.get("weather", {}).get("icon")
-                },
-                "wind": {
-                    "speed": obs.get("wind_spd"),
-                    "direction": obs.get("wind_dir"),
-                    "direction_full": obs.get("wind_cdir_full")
-                },
-                "humidity": obs.get("rh"),
-                "pressure": {
-                    "station": obs.get("pres"),
-                    "sea_level": obs.get("slp")
-                },
-                "clouds": obs.get("clouds"),
-                "visibility": obs.get("vis"),
-                "solar_radiation": obs.get("solar_rad"),
-                "uv_index": obs.get("uv"),
-                "air_quality_index": obs.get("aqi")
-            }
-
-            logger.info("Successfully fetched weather information")
-            return result
-
+            logger.info(f"Making request to {url}")
+            response = requests.get(url, headers=headers)
+            
+            # Handle API response
+            if response.status_code == 200:
+                weather_data = response.json()
+                
+                # Transform to a cleaner format
+                result = {
+                    "location": {
+                        "name": city,
+                        "country": country_code or weather_data.get("sys", {}).get("country", "Unknown")
+                    },
+                    "temperature": {
+                        "current": weather_data.get("main", {}).get("temp"),
+                        "feels_like": weather_data.get("main", {}).get("feels_like"),
+                        "min": weather_data.get("main", {}).get("temp_min"),
+                        "max": weather_data.get("main", {}).get("temp_max")
+                    },
+                    "weather": {
+                        "description": weather_data.get("weather", [{}])[0].get("description", "Unknown"),
+                        "main": weather_data.get("weather", [{}])[0].get("main", "Unknown"),
+                        "icon": weather_data.get("weather", [{}])[0].get("icon")
+                    },
+                    "wind": {
+                        "speed": weather_data.get("wind", {}).get("speed"),
+                        "direction": weather_data.get("wind", {}).get("deg")
+                    },
+                    "humidity": weather_data.get("main", {}).get("humidity"),
+                    "pressure": weather_data.get("main", {}).get("pressure"),
+                    "clouds": weather_data.get("clouds", {}).get("all"),
+                    "visibility": weather_data.get("visibility")
+                }
+                
+                logger.info("Successfully fetched weather information")
+                return result
+            else:
+                error_msg = f"API request failed with status code {response.status_code}"
+                try:
+                    error_data = response.json()
+                    if 'message' in error_data:
+                        error_msg = f"API error: {error_data['message']}"
+                except:
+                    pass
+                logger.error(error_msg)
+                return {"error": error_msg, "status": "failed"}
+                
         except Exception as e:
             logger.error(f"An error occurred while fetching weather: {e}")
             return {"error": str(e), "status": "failed"}
-
-    def health_check(self):
+    
+    def health_check(self) -> Dict[str, str]:
         """
-        Check if the Weatherbit API connection is functional.
+        Check if the Open Weather API connection is functional.
         
         Returns:
-            dict: Health status of the agent.
+            dict: Health status of the agent
         """
         try:
             if not self.api_key:
                 return {"status": "unhealthy", "message": "No API key provided"}
-
-            logger.info("Performing Weatherbit API health check...")
             
-            # Try to fetch weather for a default location (e.g., New York)
-            params = {
-                "key": self.api_key,
-                "city": "New York,NY"
+            logger.info("Performing Open Weather API health check...")
+            
+            # Testing with a common city
+            headers = {
+                'x-rapidapi-key': self.api_key,
+                'x-rapidapi-host': self.host
             }
             
-            response = requests.get(self.base_url, params=params)
+            test_url = f"{self.base_url}/city/london/GB"
+            response = requests.get(test_url, headers=headers)
             
             if response.status_code == 200:
-                logger.info("Weatherbit API health check passed.")
-                return {"status": "healthy", "message": "Weatherbit API service is available"}
+                logger.info("Open Weather API health check passed")
+                return {"status": "healthy", "message": "Open Weather API service is available"}
             else:
-                raise ValueError(f"Health check failed with status code {response.status_code}")
+                error_msg = f"Health check failed with status code {response.status_code}"
+                try:
+                    error_data = response.json()
+                    if 'message' in error_data:
+                        error_msg = f"Health check failed: {error_data['message']}"
+                except:
+                    pass
+                raise ValueError(error_msg)
         
         except Exception as e:
-            logger.error(f"Weatherbit API health check failed: {e}")
+            logger.error(f"Open Weather API health check failed: {e}")
             return {"status": "unhealthy", "message": str(e)}

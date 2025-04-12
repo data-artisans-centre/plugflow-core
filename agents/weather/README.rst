@@ -1,14 +1,14 @@
 Weather Agent
 ==============
 
-The **Weather Agent** is designed to fetch real-time weather data using the Weatherbit API. It supports fetching weather details based on a city name or geographic coordinates.
+The **Weather Agent** is designed to fetch real-time weather data using the Open Weather API from RapidAPI. It supports fetching weather details based on a city name and optional country code.
 
 Features
 --------
 
-- Fetch real-time weather details using the Weatherbit API.
-- Supports input by city name or latitude/longitude coordinates.
-- Customizable output with options for units (Metric/Imperial) and language.
+- Fetch real-time weather details using the Open Weather API.
+- Supports input by city name with optional country code.
+- Detailed weather information including temperature, wind, humidity, and more.
 - Health check functionality to verify the API service status.
 - Detailed logging for debugging and monitoring.
 
@@ -26,21 +26,20 @@ Parameters
 
 The agent accepts the following parameters:
 
-- ``api_key`` (str, optional): Weatherbit API key.
-- ``location`` (str, optional): Name of the city.
-- ``lat`` (float, optional): Latitude of the location.
-- ``lon`` (float, optional): Longitude of the location.
-- ``units`` (str, optional): Measurement units ("M" for Metric, "I" for Imperial). Default: "M".
-- ``language`` (str, optional): Language code for the response. Default: "en".
+- ``api_key`` (str, optional): RapidAPI key for Open Weather API.
+- ``city`` (str): Name of the city.
+- ``country_code`` (str, optional): Two-letter country code.
 
 Example Usage
 -------------
 
-To execute the agent:
+To execute the agent via CLI:
 
 .. code-block:: bash
-    python main.py execute weather --params "{\"api_key\":\"********************\",\"location\":\"Coimbatore,IN\"}"
+    
+    python main.py execute weather --params "{\"api_key\":\"your_api_key\",\"city\":\"Coimbatore\",\"country_code\":\"IN\"}"
 
+To use in Python code:
 
 .. code-block:: python
 
@@ -49,11 +48,11 @@ To execute the agent:
     weather_agent = WeatherAgent(api_key="your_api_key")
 
     # Fetch weather by city name
-    result = weather_agent.execute(location="New York")
+    result = weather_agent.execute(city="New York")
     print(result)
 
-    # Fetch weather by coordinates
-    result = weather_agent.execute(lat=40.7128, lon=-74.0060)
+    # Fetch weather by city name and country code
+    result = weather_agent.execute(city="London", country_code="GB")
     print(result)
 
 Output
@@ -66,34 +65,27 @@ The agent returns the fetched weather details as a dictionary. Example output:
     {
         "location": {
             "name": "New York",
-            "country": "US",
-            "latitude": 40.7128,
-            "longitude": -74.0060
+            "country": "US"
         },
         "temperature": {
             "current": 22.5,
-            "feels_like": 25.0
+            "feels_like": 25.0,
+            "min": 20.0,
+            "max": 24.0
         },
         "weather": {
             "description": "Partly cloudy",
-            "code": 802,
-            "icon": "c02d"
+            "main": "Clouds",
+            "icon": "02d"
         },
         "wind": {
             "speed": 3.1,
-            "direction": 180,
-            "direction_full": "South"
+            "direction": 180
         },
         "humidity": 65,
-        "pressure": {
-            "station": 1015.2,
-            "sea_level": 1016.5
-        },
+        "pressure": 1015.2,
         "clouds": 40,
-        "visibility": 10,
-        "solar_radiation": 500,
-        "uv_index": 5,
-        "air_quality_index": 50
+        "visibility": 10000
     }
 
 Testing
@@ -105,12 +97,12 @@ Run all tests:
 
 .. code-block:: bash
 
-    pytest weather_test.py
+    pytest agents/weather/tests/weather_test.py
 
 Health Check
 ------------
 
-The agent includes a ``health_check`` method to verify its operational status. The method attempts to fetch weather data for a default location and returns a status message.
+The agent includes a ``health_check`` method to verify its operational status. The method attempts to fetch weather data for London, GB and returns a status message.
 
 Example health check output:
 
@@ -118,7 +110,7 @@ Example health check output:
 
     {
         "status": "healthy",
-        "message": "Weatherbit API service is available"
+        "message": "Open Weather API service is available"
     }
 
 Contributing
@@ -134,4 +126,3 @@ License
 -------
 
 This agent is distributed under the MIT License. See the LICENSE file for more information.
-
