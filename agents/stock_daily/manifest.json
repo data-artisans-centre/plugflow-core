@@ -1,1 +1,10 @@
+{
+    "name": "stock_daily",
+    "entry_point": "__init__",
+    "description":"This agent fetches daily stock data from AlphaVantage.",
+    "category":"Finance",
+    "tags":["open","close","symbol"],
+    "authors":["Nilanjana Dey <nilanjanadey276@gmail.com>"],
+    "class_name": "StockDailyFetcher"
+}
 

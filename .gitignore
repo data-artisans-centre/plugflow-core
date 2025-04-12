@@ -1,9 +1,7 @@
 *.pyc
 __pycache__/
-<<<<<<< Updated upstream
 .idea/
 .idea/*
 env
-=======
-env
->>>>>>> Stashed changes
+.vscode/
+
