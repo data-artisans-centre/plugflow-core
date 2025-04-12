@@ -144,3 +144,4 @@ def test_large_output_size():
         datatype="json"
     )
     assert len(response["Time Series (Daily)"]) > 1000, "Expected more than 1000 records for full output size"
+
