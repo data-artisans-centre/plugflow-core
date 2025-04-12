@@ -1,0 +1,9 @@
+{
+    "name": "profanity_checker",
+    "entry_point": "__init__",
+    "description":"This Python module detects bad words, swear words, and profanity in a given text and allows you to censor detected words and provides useful information about the profane words in the input content.",
+    "category":"LangProcessing",
+    "tags":"",
+    "authors":["Nilanjana Dey <nilanjanadey276@gmail.com>"],
+    "class_name": "ProfanityCheckerAgent"
+}

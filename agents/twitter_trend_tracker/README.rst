@@ -1,0 +1,1 @@
+python main.py execute twitter_trend_tracker --params '{\"hashtag\": \"#Narendra Modi\", \"api_key\": \"api_key\", \"limit\": 2, \"section\": \"top\", \"language\": \"en\"}'

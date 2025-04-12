@@ -1,0 +1,5 @@
+{
+    "name": "crickAlert",
+    "entry_point": "__init__",
+    "class_name": "CrickAlertAgent"
+}

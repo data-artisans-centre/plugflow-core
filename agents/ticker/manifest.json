@@ -1,0 +1,9 @@
+{
+    "name": "ticker",
+    "entry_point": "__init__",
+    "description":"This uses yahoo finance public api's(yfinance) to deliver stock data seamlessly ",
+    "category":"StockMarket",
+    "tags":"",
+    "authors":["Ujan Galui <ujan.g570@gmail.com> (～￣▽￣)～"],
+    "class_name": "TickerAgent"
+}
