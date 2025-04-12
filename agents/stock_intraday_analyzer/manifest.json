@@ -1,0 +1,9 @@
+{
+    "name": "stock_intraday_analyzer",
+    "entry_point": "__init__",
+    "description":"This agent aims at fetching and analyzing stock market intraday data using the Alpha Vantage API",
+    "category":"Finance",
+    "tags":"",
+    "authors":["Nilanjana Dey <nilanjanadey276@gmail.com>"],
+    "class_name": "StockDataFetcher"
+}

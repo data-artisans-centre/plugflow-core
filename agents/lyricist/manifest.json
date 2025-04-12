@@ -1,0 +1,5 @@
+{
+    "name": "lyricist",
+    "entry_point": "__init__",
+    "class_name": "LyricsAgent"
+}

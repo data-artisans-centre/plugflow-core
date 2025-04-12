@@ -5,53 +5,48 @@ from core.base import AgentBase
 from log import logger
 
 
-class DailyRequestModel(BaseModel):
-    """Pydantic model for validating daily stock request parameters."""
-    symbol: str = Field(..., description="Stock ticker symbol (e.g., IBM, RELIANCE.BSE)")
+class IntradayRequestModel(BaseModel):
+    """Pydantic model for validating intraday request parameters."""
+    symbol: str = Field(..., description="Stock ticker symbol (e.g., META, IBM)")
+    interval: str = Field(..., description="Time interval (1min, 5min, 15min, 30min, 60min)")
     apikey: str = Field(..., description="API key for Alpha Vantage")
     outputsize: str = Field("compact", description="Data output size ('compact' or 'full')")
-    datatype: str = Field("json", description="Response format ('json') ")
+    month: Optional[str] = Field(None, description="Specific month in YYYY-MM format (optional)")
 
-    @field_validator("outputsize")
-    def validate_outputsize(cls, value):
-        valid_output_sizes = {"compact", "full"}
-        if value not in valid_output_sizes:
-            raise ValueError(f"Invalid outputsize: {value}. Valid options are {valid_output_sizes}.")
-        return value
-
-    @field_validator("datatype")
-    def validate_datatype(cls, value):
-        valid_datatypes = {"json"}
-        if value not in valid_datatypes:
-            raise ValueError(f"Invalid datatype: {value}. Valid options are {valid_datatypes}.")
+    @field_validator("interval")
+    def validate_interval(cls, value):
+        valid_intervals = {"1min", "5min", "15min", "30min", "60min"}
+        if value not in valid_intervals:
+            raise ValueError(f"Invalid interval: {value}. Valid intervals are {valid_intervals}.")
         return value
 
 
-class StockDailyFetcher(AgentBase):
-    """Agent to fetch daily stock data from Alpha Vantage."""
+class StockDataFetcher(AgentBase):
+    """Agent to fetch intraday stock data from Alpha Vantage."""
     BASE_URL = "https://www.alphavantage.co/query"
 
-    def execute(self, apikey: str, symbol: str, outputsize: str = "compact", datatype: str = "json") -> str:
+    def execute(self, apikey: str, symbol: str, interval: str, outputsize: str = "compact", month: Optional[str] = None) -> str:
         """
-        Fetch daily stock data based on the provided parameters.
+        Fetch intraday stock data based on the provided parameters.
 
         Args:
             apikey (str): The API key for authentication.
-            symbol (str): The stock symbol (e.g., 'IBM').
+            symbol (str): The stock symbol (e.g., 'META').
+            interval (str): The time interval between data points (e.g., '1min').
             outputsize (str): The size of the output data ('compact' or 'full').
-            datatype (str): The response format ('json' or 'csv').
+            month (Optional[str]): The month to fetch data for (e.g., '2020-01').
 
         Returns:
-            str: JSON string or CSV string containing stock data.
+            str: JSON string containing stock data.
 
         Raises:
             ValueError: If the request fails or the symbol is invalid.
         """
         params = {
-            "function": "TIME_SERIES_DAILY",
+            "function": "TIME_SERIES_INTRADAY",
             "symbol": symbol,
+            "interval": interval,
             "outputsize": outputsize,
-            "datatype": datatype,
             "apikey": apikey,
         }
 
@@ -64,13 +59,13 @@ class StockDailyFetcher(AgentBase):
             logger.error("Failed to fetch stock data. Please check the API or network.")
             raise ValueError("Failed to fetch stock data. Please check the API or network.") from e
 
-        data = response.json() if datatype == "json" else response.text
+        data = response.json()
 
-        if "Error Message" in data if datatype == "json" else "Error" in data:
+        if "Error Message" in data:
             logger.error(f"Invalid stock symbol: {symbol}")
             raise ValueError(f"Invalid stock symbol: {symbol}")
 
-        logger.info("Successfully fetched daily stock data.")
+        logger.info("Successfully fetched stock data.")
         return data
 
     def health_check(self, apikey: str) -> dict:
@@ -89,10 +84,10 @@ class StockDailyFetcher(AgentBase):
             test_result = self.execute(
                 apikey=apikey,
                 symbol="IBM",
-                outputsize="compact",
-                datatype="json"
+                interval="1min",
+                outputsize="compact"
             )
-            if "Meta Data" in test_result:
+            if "Time Series (1min)" in test_result:
                 return {"status": "healthy", "message": "Service is operational"}
             else:
                 return {"status": "unhealthy", "message": "Unexpected API response"}
