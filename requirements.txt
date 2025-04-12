@@ -1,4 +1,5 @@
 pytest
+pytest-asyncio
 youtube-comment-downloader
 click
 beautifulsoup4
@@ -9,5 +10,4 @@ textblob
 #ticker
 yfinance
 pydantic
-
-yfinance
+python-whois
