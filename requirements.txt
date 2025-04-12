@@ -1,4 +1,4 @@
-pytest
+pytest~=7.4.0
 youtube-comment-downloader
 click
 beautifulsoup4
