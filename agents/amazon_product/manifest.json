@@ -1,0 +1,55 @@
+{
+    "name": "amazon_product",
+    "description": "Fetch product details from Amazon using the Real-Time Amazon Data API",
+    "version": "1.0.0",
+    "entry_point": "__init__",
+    "class_name": "AmazonProductAgent",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "api_key": {
+                "type": "string",
+                "description": "RapidAPI key for Real-Time Amazon Data API"
+            },
+            "query": {
+                "type": "string",
+                "description": "Search query for Amazon products"
+            },
+            "page": {
+                "type": "integer",
+                "description": "Page number for results",
+                "default": 1
+            },
+            "country": {
+                "type": "string",
+                "description": "Country code for Amazon marketplace",
+                "default": "US",
+                "enum": ["US", "CA", "UK", "DE", "FR", "JP", "IN"]
+            },
+            "sort_by": {
+                "type": "string",
+                "description": "Sort results by",
+                "default": "RELEVANCE",
+                "enum": ["RELEVANCE", "PRICE_LOW_TO_HIGH", "PRICE_HIGH_TO_LOW", "CUSTOMER_RATINGS", "NEWEST_ARRIVALS", "FEATURED"]
+            },
+            "product_condition": {
+                "type": "string",
+                "description": "Product condition filter",
+                "default": "ALL",
+                "enum": ["ALL", "NEW", "USED", "REFURBISHED"]
+            },
+            "is_prime": {
+                "type": "boolean",
+                "description": "Filter for Prime eligible items",
+                "default": false
+            },
+            "deals_and_discounts": {
+                "type": "string",
+                "description": "Filter for deals",
+                "default": "NONE",
+                "enum": ["NONE", "TODAYS_DEALS", "LIGHTNING_DEALS", "DEALS"]
+            }
+        },
+        "required": ["query"]
+    }
+}
