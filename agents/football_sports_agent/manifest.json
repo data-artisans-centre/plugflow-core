@@ -1,5 +1,0 @@
-{
-    "name": "football_sports_agent",
-    "entry_point": "__init__",
-    "class_name": "SportsAgent"
-}

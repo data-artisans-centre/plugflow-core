@@ -1,0 +1,25 @@
+{
+    "name": "weather",
+    "description": "Fetch real-time weather information for a given location",
+    "version": "1.0.0",
+    "entry_point": "__init__",
+    "class_name": "WeatherAgent",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "api_key": {
+                "type": "string",
+                "description": "RapidAPI key for Open Weather API"
+            },
+            "city": {
+                "type": "string",
+                "description": "City name to fetch weather for"
+            },
+            "country_code": {
+                "type": "string",
+                "description": "Two-letter country code (optional)"
+            }
+        },
+        "required": ["city"]
+    }
+}
