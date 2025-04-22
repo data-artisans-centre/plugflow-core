@@ -1,7 +1,7 @@
 import pytest
 import json
 from unittest.mock import MagicMock, patch
-from agents.steam_news import GameNewsAgent  # Changed from game_news to steam_news
+from agents.steam_news import GameNewsAgent  
 
 
 @pytest.fixture
