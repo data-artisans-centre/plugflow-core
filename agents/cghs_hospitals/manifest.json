@@ -1,0 +1,9 @@
+{
+    "name": "cghs_hospitals",
+    "entry_point": "__init__",
+    "description":"This Python module returns the lists of hospitals empaneled under CGHS in all over India.",
+    "category":"healthcare",
+    "tags":"",
+    "authors":["Nilanjana Dey <nilanjanadey276@gmail.com>"],
+    "class_name": "CGHSHospitalsAgent"
+    }
