@@ -1,0 +1,9 @@
+{
+"name": "valid_email",
+"entry_point": "__init__",
+"description":"This Python module analyzes every email id given by the user and returns whether it is valid or not.",
+"category":"LangProcessing",
+"tags":"",
+"authors":["Nilanjana Dey <nilanjanadey276@gmail.com>"],
+"class_name": "EmailValidationAgent"
+}
